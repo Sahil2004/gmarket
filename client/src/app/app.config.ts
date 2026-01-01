@@ -20,12 +20,12 @@ export const appConfig: ApplicationConfig = {
     },
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
-      useFactory: (ds: IDesignSystem) => ds.surface.MatFormFieldAppearance,
+      useFactory: (ds: IDesignSystem) => ({ appearance: ds.surface.MatFormFieldAppearance }),
       deps: [DESIGN_SYSTEM],
     },
     {
       provide: MAT_CARD_CONFIG,
-      useFactory: (ds: IDesignSystem) => ds.surface.MatCardAppearance,
+      useFactory: (ds: IDesignSystem) => ({ appearance: ds.surface.MatCardAppearance }),
       deps: [DESIGN_SYSTEM],
     },
   ],
