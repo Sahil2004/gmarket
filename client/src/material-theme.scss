@@ -5,6 +5,14 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+:root {
+  @include mat.card-overrides(
+    (
+      subtitle-text-weight: var(--subtitle-text-weight),
+    )
+  );
+}
+
 html {
   height: 100%;
   @include mat.theme(
