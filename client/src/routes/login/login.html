@@ -1,27 +1,29 @@
-<mat-card class="lg:w-1/4 md:w-1/2 w-full mx-auto mt-[50vh] -translate-y-1/2">
-  <mat-card-header class="mb-5">
-    <h1 matCardTitle>Welcome back!</h1>
-    <h2 matCardSubtitle>Login to start trading.</h2>
-  </mat-card-header>
-  <mat-card-content>
-    <form action="" class="flex flex-col gap-2">
-      <mat-form-field>
-        <mat-label>Username</mat-label>
-        <input type="text" matInput placeholder="Enter your username" />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Password</mat-label>
-        <input type="password" matInput placeholder="Enter your password" />
-      </mat-form-field>
-    </form>
-  </mat-card-content>
-  <mat-card-actions align="end">
-    <button matButton="filled">Login</button>
-  </mat-card-actions>
-  <mat-card-footer class="mt-2 mb-5">
-    <p class="text-center">
-      Don't have an account?
-      <a href="/register" class="cursor-pointer hover:underline">Register here</a>
-    </p>
-  </mat-card-footer>
-</mat-card>
+<section class="flex justify-center items-center w-full h-full">
+  <mat-card class="lg:w-1/4 md:w-1/2 w-full h-fit">
+    <mat-card-header class="mb-5">
+      <h1 matCardTitle>Welcome back!</h1>
+      <h2 matCardSubtitle>Login to start trading.</h2>
+    </mat-card-header>
+    <mat-card-content>
+      <form action="" class="flex flex-col gap-2">
+        <mat-form-field>
+          <mat-label>Username</mat-label>
+          <input type="text" matInput placeholder="Enter your username" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Password</mat-label>
+          <input type="password" matInput placeholder="Enter your password" />
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button matButton="filled">Login</button>
+    </mat-card-actions>
+    <mat-card-footer class="mt-2 mb-5">
+      <p class="text-center">
+        Don't have an account?
+        <a href="/register" class="cursor-pointer hover:underline">Register here</a>
+      </p>
+    </mat-card-footer>
+  </mat-card>
+</section>
