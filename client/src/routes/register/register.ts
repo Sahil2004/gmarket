@@ -26,8 +26,7 @@ import { UserService } from '../../services/user.service';
   ],
 })
 export class Register {
-  constructor(private router: Router) {}
-
+  private router = inject(Router);
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
   private _snackBar = inject(MatSnackBar);
