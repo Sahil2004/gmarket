@@ -10,13 +10,14 @@ export class UserDataStore {
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     this._isBrowser = isPlatformBrowser(this.platformId);
-    if (this._isBrowser) this._userData = JSON.parse(sessionStorage.getItem('userData') || '[]');
+    if (this._isBrowser)
+      this._userData = JSON.parse(sessionStorage.getItem('userDataStore') || '[]');
     else this._userData = [];
   }
 
   saveToSession() {
     if (!this._isBrowser) return;
-    sessionStorage.setItem('userData', JSON.stringify(this._userData));
+    sessionStorage.setItem('userDataStore', JSON.stringify(this._userData));
   }
 
   findUserById(id: string): IUserData | null {

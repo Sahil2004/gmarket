@@ -27,4 +27,8 @@ export class UserService {
     this.user = this.ds.setUser({ name, email, password });
     return true;
   }
+
+  isAuthenticated(): boolean {
+    return this.user !== null;
+  }
 }

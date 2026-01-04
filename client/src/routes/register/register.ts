@@ -5,7 +5,7 @@ import {
   ReactiveFormsModule,
   type ValidationErrors,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,6 +23,7 @@ import { UserService } from '../../services/user.service';
     MatInputModule,
     MatButtonModule,
     ReactiveFormsModule,
+    RouterLink,
   ],
 })
 export class Register {
