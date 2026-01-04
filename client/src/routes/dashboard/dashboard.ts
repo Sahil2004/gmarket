@@ -26,10 +26,22 @@ export class Dashboard {
   readonly ds = inject(DESIGN_SYSTEM);
   readonly title = this.ds.app.APP_NAME;
   readonly router = inject(Router);
+  readonly isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
   opened = true;
   navItems = [
     { label: 'watchlist', icon: 'bookmark' },
     { label: 'profile', icon: 'person' },
   ];
   activeLink = this.router.url.split('/').pop();
+  toggleDarkMode() {
+    this.ds.color.theme =
+      this.ds.color.theme === 'system'
+        ? this.isDarkMode
+          ? 'light'
+          : 'dark'
+        : this.ds.color.theme === 'light'
+        ? 'dark'
+        : 'light';
+    document.documentElement.style.setProperty('--theme', this.ds.color.theme);
+  }
 }

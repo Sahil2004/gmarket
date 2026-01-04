@@ -4,6 +4,17 @@
   </button>
   <h1>{{ title }}</h1>
   <span class="flex-1"></span>
+  <button matIconButton aria-label="dark mode switcher" (click)="toggleDarkMode()">
+    <mat-icon>{{
+      ds.color.theme === 'system'
+        ? isDarkMode
+          ? 'light_mode'
+          : 'dark_mode'
+        : ds.color.theme === 'light'
+        ? 'dark_mode'
+        : 'light_mode'
+    }}</mat-icon>
+  </button>
 </mat-toolbar>
 <mat-sidenav-container class="h-full">
   <mat-sidenav #sidenav mode="side" [(opened)]="opened">
