@@ -5,11 +5,14 @@ import {
   ReactiveFormsModule,
   type ValidationErrors,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'login',
@@ -23,7 +26,12 @@ import { MatButtonModule } from '@angular/material/button';
   ],
 })
 export class Login {
+  constructor(private router: Router) {}
+
   private fb = inject(FormBuilder);
+  private userService = inject(UserService);
+  private _snackBar = inject(MatSnackBar);
+
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
@@ -48,6 +56,19 @@ export class Login {
     return '';
   }
   loginHandler() {
-    console.log(this.loginForm.value);
+    let email = this.email?.value;
+    let password = this.password?.value;
+    if (!email || !password) return;
+    const res = this.userService.login(email, password);
+    if (res) {
+      this.router.navigate(['/dashboard']);
+    } else {
+      let snackBarRef = this._snackBar.open('Invalid email or password', 'Close', {
+        duration: 3000,
+      });
+      snackBarRef.onAction().subscribe(() => {
+        snackBarRef.dismiss();
+      });
+    }
   }
 }

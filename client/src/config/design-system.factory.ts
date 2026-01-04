@@ -1,4 +1,4 @@
-import { IDesignSystem } from './design-system';
+import { IDesignSystem } from '../types/design-system.types';
 import { environment } from '../environments/environment';
 
 import { GMarket } from './design-systems/gmarket.config';

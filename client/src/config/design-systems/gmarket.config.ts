@@ -1,4 +1,4 @@
-import { IDesignSystem } from '../design-system';
+import { IDesignSystem } from '../../types/design-system.types';
 
 export class GMarket implements IDesignSystem {
   app: IDesignSystem['app'] = {

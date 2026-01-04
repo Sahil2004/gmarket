@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { IDesignSystem } from './design-system';
+import { IDesignSystem } from '../types/design-system.types';
 
 export function applyDesignSystem(ds: IDesignSystem, platform_id: object): void {
   if (!isPlatformBrowser(platform_id)) return;

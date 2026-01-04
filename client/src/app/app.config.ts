@@ -13,7 +13,7 @@ import { routes } from './app.routes';
 import { AppTitleStrategy } from '../services';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { DESIGN_SYSTEM } from '../config';
-import { IDesignSystem } from '../config/design-system';
+import { IDesignSystem } from '../types/design-system.types';
 import { applyDesignSystem } from '../config/design-system.apply';
 
 export const appConfig: ApplicationConfig = {
