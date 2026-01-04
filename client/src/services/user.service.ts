@@ -18,4 +18,13 @@ export class UserService {
     }
     return false;
   }
+
+  register(name: string, email: string, password: string): boolean {
+    const existingUser = this.ds.findUserByEmail(email);
+    if (existingUser) {
+      return false;
+    }
+    this.user = this.ds.setUser({ name, email, password });
+    return true;
+  }
 }

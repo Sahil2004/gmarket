@@ -1,0 +1,45 @@
+<section class="flex justify-center items-center w-full h-full">
+  <mat-card class="lg:w-1/4 md:w-1/2 w-full h-fit">
+    <mat-card-header class="mb-5">
+      <h1 matCardTitle>Create an account</h1>
+      <h2 matCardSubtitle>Register to start trading.</h2>
+    </mat-card-header>
+    <form [formGroup]="registerForm" (ngSubmit)="registerHandler()">
+      <mat-card-content class="flex! flex-col gap-2">
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input type="text" matInput formControlName="name" placeholder="Enter your Name" />
+          <mat-error>
+            {{ getErrorMessage('Name', name?.errors) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input type="email" matInput formControlName="email" placeholder="Enter your Email" />
+          <mat-error>
+            {{ getErrorMessage('Email', email?.errors) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Password</mat-label>
+          <input
+            type="password"
+            matInput
+            formControlName="password"
+            placeholder="Enter your password"
+          />
+          <mat-error> {{ getErrorMessage('Password', password?.errors) }} </mat-error>
+        </mat-form-field>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button type="submit" matButton="filled" [disabled]="!registerForm.valid">Register</button>
+      </mat-card-actions>
+    </form>
+    <mat-card-footer class="mt-2 mb-5">
+      <p class="text-center">
+        Already have an account?
+        <a href="/login" class="cursor-pointer hover:underline">Login here</a>
+      </p>
+    </mat-card-footer>
+  </mat-card>
+</section>

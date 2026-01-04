@@ -1,13 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import type { IUserData } from '../types/user-data.types';
 import type { IUserDTO, IUserResponseDTO } from '../dtos/user.dto';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
 export class UserDataStore {
+  private _isBrowser: boolean;
   private _userData: IUserData[];
 
-  constructor() {
-    this._userData = [];
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    this._isBrowser = isPlatformBrowser(this.platformId);
+    if (this._isBrowser) this._userData = JSON.parse(sessionStorage.getItem('userData') || '[]');
+    else this._userData = [];
+  }
+
+  saveToSession() {
+    if (!this._isBrowser) return;
+    sessionStorage.setItem('userData', JSON.stringify(this._userData));
   }
 
   findUserById(id: string): IUserData | null {
@@ -15,6 +24,7 @@ export class UserDataStore {
   }
 
   findUserByEmail(email: string): IUserData | null {
+    console.log(this._userData);
     return this._userData.find((user) => user.email === email) ?? null;
   }
 
@@ -30,6 +40,7 @@ export class UserDataStore {
       updatedAt: new Date(),
     };
     this._userData.push(newUser);
+    this.saveToSession();
     return newUser;
   }
 }
