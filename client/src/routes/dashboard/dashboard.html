@@ -1,10 +1,29 @@
 <mat-toolbar class="flex gap-4 items-center">
-  <button matIconButton aria-label="menu">
+  <button matIconButton aria-label="menu" (click)="sidenav.toggle()">
     <mat-icon>menu</mat-icon>
   </button>
   <h1>{{ title }}</h1>
   <span class="flex-1"></span>
-  <button matIconButton aria-label="profile" [routerLink]="['/profile']">
-    <mat-icon>account_circle</mat-icon>
-  </button>
 </mat-toolbar>
+<mat-sidenav-container class="h-full">
+  <mat-sidenav #sidenav mode="side" [(opened)]="opened">
+    <mat-nav-list>
+      @for (link of navItems; track link) {
+      <a
+        mat-list-item
+        [routerLink]="['/' + link.label]"
+        (click)="$event.preventDefault(); activeLink = link.label"
+        [activated]="activeLink === link.label"
+      >
+        <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+        <span matListItemTitle>
+          {{ link.label | titlecase }}
+        </span>
+      </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

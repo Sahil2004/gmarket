@@ -61,7 +61,7 @@ export class Login {
     if (!email || !password) return;
     const res = this.userService.login(email, password);
     if (res) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/watchlist']);
     } else {
       let snackBarRef = this._snackBar.open('Invalid email or password', 'Close', {
         duration: 3000,
