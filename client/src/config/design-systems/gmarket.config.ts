@@ -4,6 +4,9 @@ export class GMarket implements IDesignSystem {
   app: IDesignSystem['app'] = {
     APP_NAME: 'G-Market',
   };
+  color: IDesignSystem['color'] = {
+    theme: 'system',
+  };
   typography: IDesignSystem['typography'] = {
     subtitleTextWeight: 300,
   };

@@ -11,8 +11,13 @@ interface ISurfaceSystem {
   MatCardAppearance: 'outlined' | 'raised' | 'filled';
 }
 
+interface IColorSystem {
+  theme: 'light' | 'dark' | 'system';
+}
+
 export interface IDesignSystem {
   app: IAppSystem;
+  color: IColorSystem;
   typography: ITypographySystem;
   surface: ISurfaceSystem;
 }

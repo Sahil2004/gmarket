@@ -6,4 +6,5 @@ export function applyDesignSystem(ds: IDesignSystem, platform_id: object): void 
   const root = document.documentElement;
 
   root.style.setProperty('--subtitle-text-weight', ds.typography.subtitleTextWeight.toString());
+  root.style.setProperty('--theme', ds.color.theme === 'system' ? 'light dark' : ds.color.theme);
 }
