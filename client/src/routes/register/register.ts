@@ -77,7 +77,7 @@ export class Register {
     if (!name || !email || !password) return;
     const res = this.userService.register(name, email, password);
     if (res) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/']);
     } else {
       let snackBarRef = this._snackBar.open('Unable to register. Please try again.', 'Close', {
         duration: 3000,

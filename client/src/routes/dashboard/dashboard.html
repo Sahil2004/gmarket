@@ -1,0 +1,10 @@
+<mat-toolbar class="flex gap-4 items-center">
+  <button matIconButton aria-label="menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <h1>{{ title }}</h1>
+  <span class="flex-1"></span>
+  <button matIconButton aria-label="profile" [routerLink]="['/profile']">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>
