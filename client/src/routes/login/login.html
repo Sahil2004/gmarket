@@ -1,0 +1,39 @@
+<section class="flex justify-center items-center w-full h-full">
+  <mat-card class="lg:w-1/4 md:w-1/2 w-full h-fit">
+    <mat-card-header class="mb-5">
+      <h1 matCardTitle>Welcome back!</h1>
+      <h2 matCardSubtitle>Login to start trading.</h2>
+    </mat-card-header>
+    <form [formGroup]="loginForm" (ngSubmit)="loginHandler()">
+      <mat-card-content class="flex! flex-col gap-2">
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input type="email" matInput formControlName="email" placeholder="Enter your Email" />
+          <mat-error>
+            {{ getErrorMessage('Email', email?.errors) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Password</mat-label>
+          <input
+            type="password"
+            matInput
+            formControlName="password"
+            placeholder="Enter your password"
+            required
+          />
+          <mat-error> {{ getErrorMessage('Password', password?.errors) }} </mat-error>
+        </mat-form-field>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button type="submit" matButton="filled" [disabled]="!loginForm.valid">Login</button>
+      </mat-card-actions>
+    </form>
+    <mat-card-footer class="mt-2 mb-5">
+      <p class="text-center">
+        Don't have an account?
+        <a routerLink="/register" class="cursor-pointer hover:underline">Register here</a>
+      </p>
+    </mat-card-footer>
+  </mat-card>
+</section>
