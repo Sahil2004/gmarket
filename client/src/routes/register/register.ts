@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../services/user.service';
+import { matchFieldValidator } from '../../directives';
 
 @Component({
   selector: 'register',
@@ -32,18 +33,27 @@ export class Register {
   private userService = inject(UserService);
   private _snackBar = inject(MatSnackBar);
 
-  registerForm = this.fb.group({
-    name: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    password: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(6),
-        Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$'),
+  registerForm = this.fb.group(
+    {
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$'),
+        ],
       ],
-    ],
-  });
+      confirmPassword: ['', Validators.required],
+    },
+    {
+      validators: matchFieldValidator('confirmPassword', 'password'),
+    }
+  );
+  get registerFormRef() {
+    return this.registerForm;
+  }
   get name() {
     return this.registerForm.get('name');
   }
@@ -52,6 +62,9 @@ export class Register {
   }
   get password() {
     return this.registerForm.get('password');
+  }
+  get confirmPassword() {
+    return this.registerForm.get('confirmPassword');
   }
   getErrorMessage(controlName: string, errors: ValidationErrors | null | undefined): string {
     if (errors) {
@@ -64,8 +77,12 @@ export class Register {
           return `${controlName} must be at least 6 characters long`;
         case 'pattern':
           return `${controlName} must contain at least one letter and one number`;
-        default:
-          return '';
+      }
+    }
+    if (this.registerForm.errors) {
+      switch (Object.keys(this.registerForm.errors)[0]) {
+        case 'fieldsMismatch':
+          return `Passwords do not match`;
       }
     }
     return '';
@@ -74,7 +91,8 @@ export class Register {
     let name = this.name?.value;
     let email = this.email?.value;
     let password = this.password?.value;
-    if (!name || !email || !password) return;
+    let confirmPassword = this.confirmPassword?.value;
+    if (!name || !email || !password || !confirmPassword) return;
     const res = this.userService.register(name, email, password);
     if (res) {
       this.router.navigate(['/watchlist']);
