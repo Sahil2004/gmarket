@@ -30,6 +30,21 @@
           />
           <mat-error> {{ getErrorMessage('Password', password?.errors) }} </mat-error>
         </mat-form-field>
+        <mat-form-field>
+          <mat-label>Confirm Password</mat-label>
+          <input
+            type="password"
+            matInput
+            formControlName="confirmPassword"
+            placeholder="Enter your password again"
+          />
+          <mat-error>
+            {{ getErrorMessage('Confirm Passsword', confirmPassword?.errors) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-error>
+          {{ getErrorMessage('', registerForm.errors) }}
+        </mat-error>
       </mat-card-content>
       <mat-card-actions align="end">
         <button type="submit" matButton="filled" [disabled]="!registerForm.valid">Register</button>
