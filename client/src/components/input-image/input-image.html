@@ -1,0 +1,13 @@
+<section class="flex flex-col gap-2">
+  @if (imageUri !== null) {
+  <img [src]="imageUri" alt="Input Image" class="w-28 h-28 rounded-full" />
+  } @else {
+  <div
+    class="w-28 h-28 rounded-full bg-gray-300 flex items-center justify-center text-3xl text-red-400 text-center"
+  >
+    {{ defaultText }}
+  </div>
+  } @if (changeImage) {
+  <button matButton>Change Photo</button>
+  }
+</section>

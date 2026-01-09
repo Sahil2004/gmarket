@@ -10,6 +10,10 @@ export class UserService {
   private user: IUserDataClient | null = null;
   private ds = inject(UserDataStore);
 
+  get currentUser(): IUserDataClient | null {
+    return this.user;
+  }
+
   login(email: string, password: string): boolean {
     const res = this.ds.findUserByEmail(email);
     if (res && res.password === password) {
