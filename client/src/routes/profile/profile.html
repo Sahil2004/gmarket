@@ -1,5 +1,8 @@
 <mat-grid-list cols="2" rowHeight="2:1">
   <mat-grid-tile colspan="2">
-    <input-image [defaultText]="nameInitials"></input-image>
+    <span class="flex w-full gap-8 h-full">
+      <input-image [defaultText]="nameInitials"></input-image>
+      <p class="text-3xl mt-6">{{ currentUser?.name }}</p>
+    </span>
   </mat-grid-tile>
 </mat-grid-list>
