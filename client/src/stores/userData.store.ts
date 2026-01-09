@@ -44,4 +44,16 @@ export class UserDataStore {
     this.saveToSession();
     return newUser;
   }
+
+  updateUser(id: string, updatedData: Partial<IUserDTO>): IUserResponseDTO | null {
+    const _user = this._userData.findIndex((u) => u.id === id);
+    if (_user === -1) return null;
+    this._userData[_user] = {
+      ...this._userData[_user],
+      ...updatedData,
+      updatedAt: new Date(),
+    };
+    this.saveToSession();
+    return this._userData[_user];
+  }
 }
