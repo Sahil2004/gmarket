@@ -56,6 +56,16 @@ export class UserDataStore {
     return this._userData[_user];
   }
 
+  updatePassword(id: string, oldPassword: string, newPassword: string): IUserResponseDTO | null {
+    const _user = this._userData.findIndex((u) => u.id === id);
+    if (_user === -1) return null;
+    if (this._userData[_user].password !== oldPassword) return null;
+    this._userData[_user].password = newPassword;
+    this._userData[_user].updatedAt = new Date();
+    this.saveToSession();
+    return this._userData[_user];
+  }
+
   deleteUser(id: string): IUserResponseDTO | null {
     const _userIndex = this._userData.findIndex((u) => u.id === id);
     if (_userIndex === -1) return null;

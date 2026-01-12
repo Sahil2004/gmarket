@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { ConfirmationDialog, InputImage } from '../../components';
+import { ChangePasswordDialog, ConfirmationDialog, InputImage } from '../../components';
 import { UserService } from '../../services/user.service';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -121,7 +121,30 @@ export class Profile {
     }
   }
 
-  openChangePasswordDialog() {}
+  openChangePasswordDialog() {
+    this._dialog.open(ChangePasswordDialog, {
+      data: {
+        onSubmit: (oldPassword: string, newPassword: string) => {
+          const success = this.userService.changePassword(oldPassword, newPassword);
+          if (success) {
+            let snackBarRef = this._snackBar.open('Password changed successfully', 'Close', {
+              duration: 3000,
+            });
+            snackBarRef.onAction().subscribe(() => {
+              snackBarRef.dismiss();
+            });
+          } else {
+            let snackBarRef = this._snackBar.open('Failed to change password', 'Close', {
+              duration: 3000,
+            });
+            snackBarRef.onAction().subscribe(() => {
+              snackBarRef.dismiss();
+            });
+          }
+        },
+      },
+    });
+  }
 
   logoutHandler() {
     this.userService.logout();
