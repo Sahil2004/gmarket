@@ -25,7 +25,6 @@ export class UserDataStore {
   }
 
   findUserByEmail(email: string): IUserData | null {
-    console.log(this._userData);
     return this._userData.find((user) => user.email === email) ?? null;
   }
 
@@ -43,5 +42,25 @@ export class UserDataStore {
     this._userData.push(newUser);
     this.saveToSession();
     return newUser;
+  }
+
+  updateUser(id: string, updatedData: Partial<IUserDTO>): IUserResponseDTO | null {
+    const _user = this._userData.findIndex((u) => u.id === id);
+    if (_user === -1) return null;
+    this._userData[_user] = {
+      ...this._userData[_user],
+      ...updatedData,
+      updatedAt: new Date(),
+    };
+    this.saveToSession();
+    return this._userData[_user];
+  }
+
+  deleteUser(id: string): IUserResponseDTO | null {
+    const _userIndex = this._userData.findIndex((u) => u.id === id);
+    if (_userIndex === -1) return null;
+    const deletedUser = this._userData.splice(_userIndex, 1)[0];
+    this.saveToSession();
+    return deletedUser;
   }
 }

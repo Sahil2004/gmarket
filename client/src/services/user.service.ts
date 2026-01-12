@@ -10,6 +10,10 @@ export class UserService {
   private user: IUserDataClient | null = null;
   private ds = inject(UserDataStore);
 
+  get currentUser(): IUserDataClient | null {
+    return this.user;
+  }
+
   login(email: string, password: string): boolean {
     const res = this.ds.findUserByEmail(email);
     if (res && res.password === password) {
@@ -26,6 +30,27 @@ export class UserService {
     }
     this.user = this.ds.setUser({ name, email, password });
     return true;
+  }
+
+  logout(): boolean {
+    this.user = null;
+    return true;
+  }
+
+  updateProfile(updatedData: Partial<IUserDataClient>): boolean {
+    if (!this.user) return false;
+    this.user = this.ds.updateUser(this.user.id, updatedData);
+    return true;
+  }
+
+  deleteAccount(): boolean {
+    if (!this.user) return false;
+    const deletedUser = this.ds.deleteUser(this.user.id);
+    if (deletedUser) {
+      this.user = null;
+      return true;
+    }
+    return false;
   }
 
   isAuthenticated(): boolean {

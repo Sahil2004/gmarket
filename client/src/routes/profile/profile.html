@@ -1,1 +1,82 @@
-<h1>Profile</h1>
+<mat-grid-list cols="2" rowHeight="fit" gutterSize="2rem" class="w-full h-full overflow-y-auto">
+  <mat-grid-tile colspan="2" class="min-h-28">
+    <span class="flex w-full gap-8 h-full">
+      <input-image
+        [imageUri]="profilePhotoUri()"
+        [defaultText]="nameInitials"
+        title="Upload a profile photo"
+        [uploadHandler]="updateProfilePhoto()"
+      ></input-image>
+      <span>
+        <p class="text-3xl mt-6">{{ currentUser.name }}</p>
+        <p class="text-lg">Client Id: {{ currentUser.id }}</p>
+      </span>
+    </span>
+  </mat-grid-tile>
+  <mat-grid-tile rowspan="3">
+    <span class="w-full h-full flex flex-col gap-8">
+      <h1 class="text-3xl">Account</h1>
+      <form
+        class="flex flex-col gap-2"
+        [formGroup]="profileForm"
+        (ngSubmit)="updateProfileHandler()"
+      >
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input
+            type="text"
+            matInput
+            formControlName="name"
+            placeholder="Update your name"
+            [value]="currentUser.name"
+          />
+          <mat-error>
+            {{ getErrorMessage('Name', name?.errors) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input
+            type="email"
+            matInput
+            formControlName="email"
+            placeholder="Update your email"
+            [value]="currentUser.email"
+          />
+          <mat-error>
+            {{ getErrorMessage('Email', email?.errors) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Phone Number</mat-label>
+          <input
+            type="tel"
+            matInput
+            formControlName="phoneNumber"
+            placeholder="Enter your phone number"
+            [value]="currentUser.phoneNumber"
+          />
+          <mat-error>
+            {{ getErrorMessage('Phone Number', phoneNumber?.errors) }}
+          </mat-error>
+        </mat-form-field>
+        <button type="submit" matButton="filled" [disabled]="!profileForm.valid">
+          Update Profile
+        </button>
+      </form>
+    </span>
+  </mat-grid-tile>
+  <mat-grid-tile rowspan="3">
+    <span class="w-full h-full flex flex-col gap-8">
+      <h1 class="text-3xl">Bank Accounts</h1>
+    </span>
+  </mat-grid-tile>
+  <mat-grid-tile class="min-h-[40vh]">
+    <span class="w-full flex flex-col gap-8">
+      <h1 class="text-3xl">Security</h1>
+      <button matButton="outlined" (click)="openChangePasswordDialog()">Change Password</button>
+      <button matButton="outlined" (click)="logoutHandler()">Logout</button>
+      <button matButton="filled" (click)="deleteAccountHandler()">Delete Account</button>
+    </span>
+  </mat-grid-tile>
+</mat-grid-list>

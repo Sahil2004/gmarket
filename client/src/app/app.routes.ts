@@ -5,6 +5,7 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('../routes').then((m) => m.Dashboard),
+    canActivate: [authGuard],
     canActivateChild: [authGuard],
     children: [
       {
