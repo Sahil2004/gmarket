@@ -1,7 +1,7 @@
 import { Component, inject, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { ImageUploadDialog } from '../../fragments';
+import { ImageUploadDialog } from '..';
 
 @Component({
   selector: 'input-image',

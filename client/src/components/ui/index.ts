@@ -1,1 +1,1 @@
-export * from './input-image/input-image';
+export * from './image-upload-dialog/image-upload-dialog';
