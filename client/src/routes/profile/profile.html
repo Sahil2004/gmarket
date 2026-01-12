@@ -1,5 +1,5 @@
-<mat-grid-list cols="2" rowHeight="fit" gutterSize="2rem" class="w-full h-full overflow-y-auto">
-  <mat-grid-tile colspan="2" class="min-h-28">
+<mat-grid-list cols="2" rowHeight="8:3" gutterSize="2rem" class="w-full h-full">
+  <mat-grid-tile colspan="2">
     <span class="flex w-full gap-8 h-full">
       <input-image
         [imageUri]="profilePhotoUri()"
@@ -13,7 +13,7 @@
       </span>
     </span>
   </mat-grid-tile>
-  <mat-grid-tile rowspan="3">
+  <mat-grid-tile rowspan="2">
     <span class="w-full h-full flex flex-col gap-8">
       <h1 class="text-3xl">Account</h1>
       <form
@@ -66,12 +66,12 @@
       </form>
     </span>
   </mat-grid-tile>
-  <mat-grid-tile rowspan="3">
+  <mat-grid-tile rowspan="2">
     <span class="w-full h-full flex flex-col gap-8">
       <h1 class="text-3xl">Bank Accounts</h1>
     </span>
   </mat-grid-tile>
-  <mat-grid-tile class="min-h-[40vh]">
+  <mat-grid-tile rowspan="2">
     <span class="w-full flex flex-col gap-8">
       <h1 class="text-3xl">Security</h1>
       <button matButton="outlined" (click)="openChangePasswordDialog()">Change Password</button>
