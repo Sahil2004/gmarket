@@ -1,7 +1,12 @@
 <mat-grid-list cols="2" rowHeight="3:1">
   <mat-grid-tile colspan="2">
     <span class="flex w-full gap-8 h-full">
-      <input-image [defaultText]="nameInitials"></input-image>
+      <input-image
+        [imageUri]="profilePhotoUri()"
+        [defaultText]="nameInitials"
+        title="Upload a profile photo"
+        [uploadHandler]="updateProfilePhoto()"
+      ></input-image>
       <span>
         <p class="text-3xl mt-6">{{ currentUser.name }}</p>
         <p class="text-lg">Client Id: {{ currentUser.id }}</p>

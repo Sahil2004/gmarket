@@ -25,7 +25,6 @@ export class UserDataStore {
   }
 
   findUserByEmail(email: string): IUserData | null {
-    console.log(this._userData);
     return this._userData.find((user) => user.email === email) ?? null;
   }
 

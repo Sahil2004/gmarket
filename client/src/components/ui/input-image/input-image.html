@@ -8,6 +8,6 @@
     {{ defaultText }}
   </div>
   } @if (changeImage) {
-  <button matButton>Change Photo</button>
+  <button matButton (click)="openImageUploadDialog()">Change Photo</button>
   }
 </section>

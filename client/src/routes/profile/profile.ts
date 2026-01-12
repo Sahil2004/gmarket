@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { InputImage } from '../../components';
 import { UserService } from '../../services/user.service';
@@ -29,6 +29,8 @@ export class Profile {
   get currentUser() {
     return this.userService.currentUser as IUserDataClient;
   }
+
+  profilePhotoUri = signal<string | null>(this.currentUser.profilePhotoUri || null);
 
   get nameInitials(): string {
     if (!this.currentUser) return '';
@@ -74,6 +76,29 @@ export class Profile {
       }
     }
     return '';
+  }
+
+  updateProfilePhoto() {
+    return (newImage: string) => {
+      const profile = this.userService.updateProfile({ profilePhotoUri: newImage });
+      if (!profile) {
+        let snackBarRef = this._snackBar.open('Failed to update profile photo', 'Close', {
+          duration: 3000,
+        });
+        snackBarRef.onAction().subscribe(() => {
+          snackBarRef.dismiss();
+        });
+        return false;
+      }
+      let snackBarRef = this._snackBar.open('Profile photo updated successfully', 'Close', {
+        duration: 3000,
+      });
+      snackBarRef.onAction().subscribe(() => {
+        snackBarRef.dismiss();
+      });
+      this.profilePhotoUri.set(this.currentUser.profilePhotoUri || null);
+      return true;
+    };
   }
 
   updateProfileHandler() {

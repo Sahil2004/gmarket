@@ -3,6 +3,7 @@ export interface IUserData {
   name: string;
   email: string;
   phoneNumber?: number;
+  profilePhotoUri?: string;
   password: string;
   createdAt: Date;
   updatedAt: Date;
@@ -13,6 +14,7 @@ export interface IUserDataClient {
   name: string;
   email: string;
   phoneNumber?: number;
+  profilePhotoUri?: string;
   createdAt: Date;
   updatedAt: Date;
 }
