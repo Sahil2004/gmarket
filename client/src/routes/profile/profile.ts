@@ -8,6 +8,7 @@ import type { IUserDataClient } from '../../types/user-data.types';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'profile',
@@ -22,6 +23,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   ],
 })
 export class Profile {
+  readonly router = inject(Router);
   readonly userService = inject(UserService);
   readonly fb = inject(FormBuilder);
   readonly _snackBar = inject(MatSnackBar);
@@ -116,4 +118,13 @@ export class Profile {
       });
     }
   }
+
+  openChangePasswordDialog() {}
+
+  logoutHandler() {
+    this.userService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  deleteAccountHandler() {}
 }

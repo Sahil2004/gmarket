@@ -32,6 +32,11 @@ export class UserService {
     return true;
   }
 
+  logout(): boolean {
+    this.user = null;
+    return true;
+  }
+
   updateProfile(updatedData: Partial<IUserDataClient>): boolean {
     if (!this.user) return false;
     this.user = this.ds.updateUser(this.user.id, updatedData);
