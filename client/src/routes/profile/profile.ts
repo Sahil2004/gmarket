@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { InputImage } from '../../components';
+import { ConfirmationDialog, InputImage } from '../../components';
 import { UserService } from '../../services/user.service';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,6 +9,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'profile',
@@ -27,6 +28,7 @@ export class Profile {
   readonly userService = inject(UserService);
   readonly fb = inject(FormBuilder);
   readonly _snackBar = inject(MatSnackBar);
+  readonly _dialog = inject(MatDialog);
 
   get currentUser() {
     return this.userService.currentUser as IUserDataClient;
@@ -126,5 +128,18 @@ export class Profile {
     this.router.navigate(['/login']);
   }
 
-  deleteAccountHandler() {}
+  deleteAccountHandler() {
+    this._dialog.open(ConfirmationDialog, {
+      data: {
+        title: 'Delete Account',
+        message: 'Are you sure you want to delete your account? This action cannot be undone.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        onConfirm: () => {
+          this.userService.deleteAccount();
+          this.router.navigate(['/login']);
+        },
+      },
+    });
+  }
 }

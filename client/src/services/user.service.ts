@@ -43,6 +43,16 @@ export class UserService {
     return true;
   }
 
+  deleteAccount(): boolean {
+    if (!this.user) return false;
+    const deletedUser = this.ds.deleteUser(this.user.id);
+    if (deletedUser) {
+      this.user = null;
+      return true;
+    }
+    return false;
+  }
+
   isAuthenticated(): boolean {
     return this.user !== null;
   }

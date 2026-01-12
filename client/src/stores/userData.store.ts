@@ -55,4 +55,12 @@ export class UserDataStore {
     this.saveToSession();
     return this._userData[_user];
   }
+
+  deleteUser(id: string): IUserResponseDTO | null {
+    const _userIndex = this._userData.findIndex((u) => u.id === id);
+    if (_userIndex === -1) return null;
+    const deletedUser = this._userData.splice(_userIndex, 1)[0];
+    this.saveToSession();
+    return deletedUser;
+  }
 }
