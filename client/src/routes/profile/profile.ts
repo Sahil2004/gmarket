@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import type { IUserDataClient } from '../../types/user-data.types';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'profile',
@@ -23,6 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class Profile {
   readonly userService = inject(UserService);
   readonly fb = inject(FormBuilder);
+  readonly _snackBar = inject(MatSnackBar);
 
   get currentUser() {
     return this.userService.currentUser as IUserDataClient;
@@ -80,6 +82,12 @@ export class Profile {
         name: this.name?.value as string,
         email: this.email?.value as string,
         phoneNumber: this.phoneNumber?.value as number | undefined,
+      });
+      let snackBarRef = this._snackBar.open('Profile updated successfully', 'Close', {
+        duration: 3000,
+      });
+      snackBarRef.onAction().subscribe(() => {
+        snackBarRef.dismiss();
       });
     }
   }

@@ -1,1 +1,2 @@
-export * from './input-image/input-image';
+export * from './fragments';
+export * from './ui';
