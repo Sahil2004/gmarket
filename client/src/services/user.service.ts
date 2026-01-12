@@ -43,6 +43,16 @@ export class UserService {
     return true;
   }
 
+  changePassword(oldPassword: string, newPassword: string): boolean {
+    if (!this.user) return false;
+    let res = this.ds.updatePassword(this.user.id, oldPassword, newPassword);
+    if (res) {
+      this.user = res;
+      return true;
+    }
+    return false;
+  }
+
   deleteAccount(): boolean {
     if (!this.user) return false;
     const deletedUser = this.ds.deleteUser(this.user.id);
