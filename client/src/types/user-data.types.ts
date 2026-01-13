@@ -4,7 +4,7 @@ export interface IUserData {
   email: string;
   phoneNumber?: number;
   profilePhotoUri?: string;
-  watchlists?: string[];
+  watchlists?: string[][];
   password: string;
   createdAt: Date;
   updatedAt: Date;
@@ -16,7 +16,7 @@ export interface IUserDataClient {
   email: string;
   phoneNumber?: number;
   profilePhotoUri?: string;
-  watchlists?: string[];
+  watchlists?: string[][];
   createdAt: Date;
   updatedAt: Date;
 }
