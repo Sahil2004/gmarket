@@ -1,0 +1,13 @@
+<article class="pt-2">
+  <mat-form-field class="w-full">
+    <mat-label>
+      {{ title }}
+    </mat-label>
+    <input type="search" matInput [formControl]="search" placeholder="Search..." />
+    @if (search.value) {
+    <button matSuffix matIconButton aria-label="Clear" (click)="clearSearch()">
+      <mat-icon>close</mat-icon>
+    </button>
+    }
+  </mat-form-field>
+</article>

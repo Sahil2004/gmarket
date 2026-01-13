@@ -1,2 +1,8 @@
-<h1>Watchlist</h1>
-<a [routerLink]="['/login']">Login</a>
+<mat-drawer-container class="w-full h-full">
+  <mat-drawer-content>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+  <mat-drawer mode="side" opened position="end" class="p-1 w-1/2">
+    <search title="Search for stocks to add to current watchlist"></search>
+  </mat-drawer>
+</mat-drawer-container>
