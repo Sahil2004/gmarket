@@ -3,11 +3,22 @@
     <mat-label>
       {{ title }}
     </mat-label>
-    <input type="search" matInput [formControl]="search" placeholder="Search..." />
+    <input
+      type="search"
+      matInput
+      [formControl]="search"
+      placeholder="Search..."
+      [matAutocomplete]="auto"
+    />
     @if (search.value) {
-    <button matSuffix matIconButton aria-label="Clear" (click)="clearSearch()">
-      <mat-icon>close</mat-icon>
+    <button matSuffix matIconButton [aria-label]="symbol" (click)="searchHandler(search.value)">
+      <mat-icon>{{ symbol }}</mat-icon>
     </button>
     }
+    <mat-autocomplete #auto="matAutocomplete">
+      @for (option of filteredOptions | async; track option) {
+      <mat-option [value]="option">{{ option }}</mat-option>
+      }
+    </mat-autocomplete>
   </mat-form-field>
 </article>
