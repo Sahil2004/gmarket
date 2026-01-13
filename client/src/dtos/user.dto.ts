@@ -6,12 +6,18 @@ export interface IUserDTO {
   profilePhotoUri?: string;
 }
 
+export interface IWatchlistDTO {
+  id: string;
+  stocks?: string[];
+}
+
 export interface IUserResponseDTO {
   id: string;
   name: string;
   email: string;
   phoneNumber?: number;
   profilePhotoUri?: string;
+  watchlists?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
