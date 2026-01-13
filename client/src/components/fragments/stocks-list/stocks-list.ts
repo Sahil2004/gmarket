@@ -10,4 +10,11 @@ import { RouterLink } from '@angular/router';
 })
 export class StocksList {
   @Input({ required: true }) stocks: string[] = [];
+  @Input() displayActions: boolean = true;
+  @Input() buyHandler: (stock: string) => void = () => {};
+  @Input() sellHandler: (stock: string) => void = () => {};
+
+  activated(stock: string): boolean {
+    return false;
+  }
 }
