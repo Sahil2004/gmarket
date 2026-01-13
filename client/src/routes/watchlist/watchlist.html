@@ -3,7 +3,16 @@
     <router-outlet></router-outlet>
   </mat-drawer-content>
   <mat-drawer mode="side" opened position="end" class="p-1">
-    <search title="Search for stocks to add to current watchlist"></search>
+    @if (stockList$ | async; as stockList) {
+    <search
+      title="Search for stocks to add to current watchlist"
+      [options]="getStockSymbols(stockList)"
+      symbol="add"
+      [searchHandler]="addStockToWatchlist()"
+    ></search>
     <watchlist-tabs></watchlist-tabs>
+    } @else {
+    <p>Loading...</p>
+    }
   </mat-drawer>
 </mat-drawer-container>
