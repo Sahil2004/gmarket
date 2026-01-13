@@ -1,0 +1,11 @@
+<mat-nav-list>
+  @for (stock of stocks; track stock) {
+  <mat-list-item [activated]="activated(stock)">
+    <a matListItemTitle [routerLink]="['/watchlist' + stock]">{{ stock }}</a>
+    @if (displayActions) {
+    <button matButton="filled" (click)="buyHandler(stock)">B</button>
+    <button matButton="outlined" (click)="sellHandler(stock)">S</button>
+    }
+  </mat-list-item>
+  }
+</mat-nav-list>
