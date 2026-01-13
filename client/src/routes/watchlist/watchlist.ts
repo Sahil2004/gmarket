@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { Search } from '../../components';
+import { Search, WatchlistTabs } from '../../components';
 
 @Component({
   selector: 'watchlist',
   templateUrl: 'watchlist.html',
-  imports: [RouterLink, RouterOutlet, MatSidenavModule, Search],
+  imports: [RouterOutlet, MatSidenavModule, Search, WatchlistTabs],
 })
 export class Watchlist {}
