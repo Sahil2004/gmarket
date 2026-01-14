@@ -68,6 +68,35 @@ export class Watchlist implements OnInit {
     };
   }
 
+  buyHandler() {
+    return (stock: string) => {
+      alert(`Buying stock: ${stock}`);
+    };
+  }
+
+  sellHandler() {
+    return (stock: string) => {
+      alert(`Selling stock: ${stock}`);
+    };
+  }
+
+  removeFromWatchlistHandler() {
+    return (stock: string) => {
+      const res = this.userService.removeStockFromWatchlist(this.currentWatchlistIdx(), stock);
+      if (!res) {
+        let snackBarRef = this._snackBar.open('Failed to remove stock from watchlist', 'Close', {
+          duration: 3000,
+        });
+        snackBarRef.onAction().subscribe(() => {
+          snackBarRef.dismiss();
+        });
+        return false;
+      }
+      this.updateWatchlists();
+      return true;
+    };
+  }
+
   watchlistChangeHandler() {
     return (event: { index: number }) => this.currentWatchlistIdx.set(event.index);
   }

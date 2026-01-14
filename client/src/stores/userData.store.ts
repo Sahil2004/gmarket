@@ -85,4 +85,16 @@ export class UserDataStore {
     this.saveToSession();
     return true;
   }
+
+  removeStockFromWatchlist(userId: string, watchlistIndex: number, stockSymbol: string): boolean {
+    const _userIdx = this._userData.findIndex((u) => u.id === userId);
+    if (_userIdx === -1) return false;
+    const watchlist = this._userData[_userIdx].watchlists[watchlistIndex];
+    const stockIdx = watchlist.indexOf(stockSymbol);
+    if (stockIdx === -1) return false;
+    watchlist.splice(stockIdx, 1);
+    this._userData[_userIdx].updatedAt = new Date();
+    this.saveToSession();
+    return true;
+  }
 }

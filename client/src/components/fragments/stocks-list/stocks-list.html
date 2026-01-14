@@ -7,6 +7,13 @@
         @if (displayActions) {
         <button matButton="filled" (click)="buyHandler(stock)">B</button>
         <button matButton="outlined" (click)="sellHandler(stock)">S</button>
+        <button
+          matIconButton
+          aria-label="Remove from watchlist"
+          (click)="removeFromWatchlistHandler(stock)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
         }
       </span>
     </span>

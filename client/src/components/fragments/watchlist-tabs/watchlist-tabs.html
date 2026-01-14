@@ -5,7 +5,12 @@
 >
   @for (watchlist of watchlists; track watchlist; let idx = $index) {
   <mat-tab [label]="(idx + 1).toString()">
-    <stocks-list [stocks]="watchlist"></stocks-list>
+    <stocks-list
+      [stocks]="watchlist"
+      [buyHandler]="buyHandler"
+      [sellHandler]="sellHandler"
+      [removeFromWatchlistHandler]="removeFromWatchlistHandler"
+    ></stocks-list>
   </mat-tab>
   }
 </mat-tab-group>

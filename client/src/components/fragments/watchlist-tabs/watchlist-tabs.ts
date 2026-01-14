@@ -10,4 +10,7 @@ import { StocksList } from '../stocks-list/stocks-list';
 export class WatchlistTabs {
   @Input() tabChangeHandler: (event: { index: number }) => void = (event) => {};
   @Input({ required: true }) watchlists!: string[][];
+  @Input() buyHandler: (stock: string) => void = () => {};
+  @Input() sellHandler: (stock: string) => void = () => {};
+  @Input() removeFromWatchlistHandler: (stock: string) => void = () => {};
 }
