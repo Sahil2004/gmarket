@@ -10,5 +10,5 @@ export const stockResolver: ResolveFn<IChartApiResponse> = (
   let stockSymbol = route.paramMap.get('symbol')!;
   let stockService = inject(StocksService);
 
-  return stockService.getChartData(stockSymbol, '1s', '1d');
+  return stockService.getChartData(`${stockSymbol}.NS`, '1m', '1d');
 };
