@@ -36,6 +36,7 @@ export class UserDataStore {
       name: user.name,
       email: user.email,
       password: user.password,
+      watchlists: Array.from({ length: 7 }, () => []),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -72,5 +73,28 @@ export class UserDataStore {
     const deletedUser = this._userData.splice(_userIndex, 1)[0];
     this.saveToSession();
     return deletedUser;
+  }
+
+  addStockToWatchlist(userId: string, watchlistIndex: number, stockSymbol: string): boolean {
+    const _userIdx = this._userData.findIndex((u) => u.id === userId);
+    if (_userIdx === -1) return false;
+    const watchlist = this._userData[_userIdx].watchlists[watchlistIndex];
+    if (watchlist.includes(stockSymbol)) return false;
+    watchlist.push(stockSymbol);
+    this._userData[_userIdx].updatedAt = new Date();
+    this.saveToSession();
+    return true;
+  }
+
+  removeStockFromWatchlist(userId: string, watchlistIndex: number, stockSymbol: string): boolean {
+    const _userIdx = this._userData.findIndex((u) => u.id === userId);
+    if (_userIdx === -1) return false;
+    const watchlist = this._userData[_userIdx].watchlists[watchlistIndex];
+    const stockIdx = watchlist.indexOf(stockSymbol);
+    if (stockIdx === -1) return false;
+    watchlist.splice(stockIdx, 1);
+    this._userData[_userIdx].updatedAt = new Date();
+    this.saveToSession();
+    return true;
   }
 }
