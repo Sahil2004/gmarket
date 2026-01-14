@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../guards';
+import { stockResolver } from '../resolvers';
 
 export const routes: Routes = [
   {
@@ -11,6 +12,15 @@ export const routes: Routes = [
       {
         path: 'watchlist',
         loadComponent: () => import('../routes').then((m) => m.Watchlist),
+        children: [
+          {
+            path: ':symbol',
+            loadComponent: () => import('../routes').then((m) => m.StockChart),
+            resolve: {
+              stockData: stockResolver,
+            },
+          },
+        ],
       },
       {
         path: 'profile',

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { IStock } from '../types/stocks.types';
+import { IChartApiResponse, IStock } from '../types/stocks.types';
 import { HttpClient } from '@angular/common/http';
 import { map, shareReplay, type Observable } from 'rxjs';
 
@@ -19,6 +19,12 @@ export class StocksService {
     return this.getAllStocks().pipe(
       shareReplay(1),
       map((stocks) => stocks.some((stock) => stock.symbol === symbol))
+    );
+  }
+
+  getChartData(symbol: string, interval: string, range: string): Observable<IChartApiResponse> {
+    return this.http.get<IChartApiResponse>(
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`
     );
   }
 }
