@@ -10,7 +10,10 @@
       symbol="add"
       [searchHandler]="addStockToWatchlist()"
     ></search>
-    <watchlist-tabs></watchlist-tabs>
+    <watchlist-tabs
+      [watchlists]="watchlists()"
+      [tabChangeHandler]="watchlistChangeHandler()"
+    ></watchlist-tabs>
     } @else {
     <p>Loading...</p>
     }

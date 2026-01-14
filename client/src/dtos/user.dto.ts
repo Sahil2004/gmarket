@@ -17,7 +17,7 @@ export interface IUserResponseDTO {
   email: string;
   phoneNumber?: number;
   profilePhotoUri?: string;
-  watchlists?: string[][];
+  watchlists: string[][];
   createdAt: Date;
   updatedAt: Date;
 }
