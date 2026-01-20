@@ -1,9 +1,8 @@
 package main
 
 import (
-	_ "github.com/Sahil2004/gmarket/server/docs"
+	"github.com/Sahil2004/gmarket/server/routes"
 	"github.com/gofiber/fiber/v2"
-	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
 // @title GMarket API
@@ -18,11 +17,7 @@ func main() {
 		return c.SendString("This is the gmarket api.")
 	})
 
-	app.Get("/swagger", func (c *fiber.Ctx) error {
-		return c.Redirect("/swagger/index.html")
-	})
-
-	app.Get("/swagger/*", fiberSwagger.WrapHandler)
+	routes.SwaggerRoute(app)
 
 	app.Listen(":3000")
 }
