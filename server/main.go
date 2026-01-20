@@ -18,6 +18,7 @@ func main() {
 	})
 
 	routes.SwaggerRoute(app)
+	routes.NotFoundRoute(app)
 
 	app.Listen(":3000")
 }
