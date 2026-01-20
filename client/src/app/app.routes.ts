@@ -19,6 +19,7 @@ export const routes: Routes = [
             resolve: {
               stockData: stockResolver,
             },
+            runGuardsAndResolvers: 'paramsOrQueryParamsChange',
           },
         ],
       },
