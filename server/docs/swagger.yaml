@@ -1,0 +1,9 @@
+basePath: /
+host: localhost:3000
+info:
+  contact: {}
+  description: Backend API for GMarket
+  title: GMarket API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
