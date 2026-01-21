@@ -5,9 +5,11 @@ go 1.25.5
 require (
 	github.com/gofiber/fiber/v2 v2.52.10
 	github.com/google/uuid v1.6.0
+	github.com/jaevor/go-nanoid v1.4.0
 	github.com/lib/pq v1.10.9
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.6
+	golang.org/x/crypto v0.32.0
 )
 
 require (

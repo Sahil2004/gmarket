@@ -9,6 +9,42 @@ definitions:
         example: Bad Request
         type: string
     type: object
+  dtos.UserDTO:
+    properties:
+      created_at:
+        example: "2023-10-01T12:00:00Z"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phone_number:
+        example: "+1234567890"
+        type: string
+      profile_picture_url:
+        example: https://example.com/profile.jpg
+        type: string
+      updated_at:
+        example: "2023-10-01T12:00:00Z"
+        type: string
+    type: object
+  dtos.UserRegistrationDTO:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: strongpassword123
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact: {}
@@ -47,9 +83,20 @@ paths:
       consumes:
       - application/json
       description: Create a new user with the provided information
+      parameters:
+      - description: User Registration Data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UserRegistrationDTO'
       produces:
       - application/json
       responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.UserDTO'
         "400":
           description: Bad Request
           schema:
