@@ -2,7 +2,9 @@ FROM node:current-alpine3.23
 
 WORKDIR /client
 
-COPY ./client/package.json ./client/package-lock.json ./
+COPY ./client/package.json ./client/pnpm-lock.yaml ./
+
+RUN npm install -g pnpm@latest
 
 RUN pnpm install
 
