@@ -1,9 +1,60 @@
-basePath: /
+basePath: /api
+definitions:
+  dtos.ErrorDTO:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: Bad Request
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact: {}
   description: Backend API for GMarket
   title: GMarket API
   version: "1.0"
-paths: {}
+paths:
+  /users:
+    delete:
+      description: Delete the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Delete current user
+      tags:
+      - users
+    get:
+      description: Retrieve information about the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Get current user
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided information
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Create a new user
+      tags:
+      - users
 swagger: "2.0"
