@@ -14,7 +14,7 @@ services:
         ports:
             - 3000:3000
         environment:
-            - DATABASE_URL=postgres://user:password@db:5432/gmarket
+            - DATABASE_URL=postgres://sahil:password@db:5432/gmarket
         depends_on:
             - db
     db:
