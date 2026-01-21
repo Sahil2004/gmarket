@@ -4,7 +4,7 @@ services:
             context: .
             dockerfile: ./Dockerfile.client
         ports:
-            - "4200:4200"
+            - 4200:4200
         depends_on:
             - server
     server:
@@ -12,7 +12,7 @@ services:
             context: .
             dockerfile: ./Dockerfile.server
         ports:
-            - "3000:3000"
+            - 3000:3000
         environment:
             - DATABASE_URL=postgres://user:password@db:5432/gmarket
         depends_on:
@@ -24,7 +24,7 @@ services:
             - POSTGRES_PASSWORD=password
             - POSTGRES_DB=gmarket
         ports:
-            - "5432:5432"
+            - 5432:5432
         volumes:
             - db_data:/var/lib/postgresql/data
 
