@@ -10,9 +10,7 @@ import (
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param user body User true "User Info"
-// @Success 201 {object} User
-// @Failure 400 {object} fiber.Map
+// @Failure 400 {object} dtos.ErrorDTO
 // @Router /users [post]
 func CreateUser(c *fiber.Ctx) error {
 	return c.SendString("Create User")
@@ -23,8 +21,7 @@ func CreateUser(c *fiber.Ctx) error {
 // @Description Retrieve information about the currently authenticated user
 // @Tags users
 // @Produce json
-// @Success 200 {object} User
-// @Failure 401 {object} fiber.Map
+// @Failure 401 {object} dtos.ErrorDTO
 // @Router /users [get]
 func GetCurrentUser(c *fiber.Ctx) error {
 	return c.SendString("Get Current User")
@@ -35,8 +32,8 @@ func GetCurrentUser(c *fiber.Ctx) error {
 // @Description Delete the currently authenticated user
 // @Tags users
 // @Produce json
-// @Success 200 {object} fiber.Map
-// @Failure 401 {object} fiber.Map
+// @Success 200
+// @Failure 401 {object} dtos.ErrorDTO
 // @Router /users [delete]
 func DeleteCurrentUser(c *fiber.Ctx) error {
 	return c.SendString("Delete Current User")
