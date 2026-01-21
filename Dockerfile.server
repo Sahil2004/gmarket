@@ -1,0 +1,20 @@
+FROM golang:tip-trixie AS builder
+
+WORKDIR /server
+
+COPY ./server/go.mod ./server/go.sum ./
+
+RUN go mod tidy
+
+COPY ./server/ .
+
+ENV CGO_ENABLED=0
+RUN go build -ldflags="-s -w" -o /gmarket-server
+
+FROM scratch
+
+COPY --from=builder ["/gmarket-server", "/server/.env", "/"]
+
+EXPOSE 3000
+
+ENTRYPOINT [ "/gmarket-server" ]
