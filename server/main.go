@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Sahil2004/gmarket/server/middlewares"
 	"github.com/Sahil2004/gmarket/server/routes"
 	"github.com/gofiber/fiber/v2"
 )
@@ -19,6 +20,8 @@ func main() {
 
 	api := fiber.New()
 	app.Mount("/api", api)
+
+	api.Use(middlewares.JwtMiddleware)
 
 	routes.SwaggerRoute(api)
 	routes.SessionRoute(api)
