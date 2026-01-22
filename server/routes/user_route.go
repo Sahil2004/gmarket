@@ -11,5 +11,5 @@ func UserRoute(a *fiber.App) {
 
 	userRouter.Post("/", controllers.CreateUser)
 	userRouter.Get("/", middlewares.AuthMiddleware, controllers.GetCurrentUser)
-	userRouter.Delete("/", controllers.DeleteCurrentUser)
+	userRouter.Delete("/", middlewares.AuthMiddleware, controllers.DeleteCurrentUser)
 }
