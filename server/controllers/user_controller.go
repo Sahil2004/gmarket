@@ -1,7 +1,16 @@
 package controllers
 
 import (
+	"encoding/base64"
+	"time"
+
+	"github.com/Sahil2004/gmarket/server/database"
+	"github.com/Sahil2004/gmarket/server/dtos"
+	"github.com/Sahil2004/gmarket/server/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"github.com/jaevor/go-nanoid"
+	"golang.org/x/crypto/argon2"
 )
 
 // CreateUser godoc
@@ -10,10 +19,50 @@ import (
 // @Tags users
 // @Accept json
 // @Produce json
+// @Param user body dtos.UserRegistrationDTO true "User Registration Data"
+// @Success 201 {object} dtos.UserDTO
 // @Failure 400 {object} dtos.ErrorDTO
 // @Router /users [post]
 func CreateUser(c *fiber.Ctx) error {
-	return c.SendString("Create User")
+	db, err := database.OpenDBConnection()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:    fiber.StatusInternalServerError,
+			Message: "Failed to connect to database",
+			DevMessage: err.Error(),
+		})
+	}
+	userData := &dtos.UserRegistrationDTO{}
+	if err := c.BodyParser(userData); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+			Code:    fiber.StatusBadRequest,
+			Message: "Invalid request body",
+			DevMessage: err.Error(),
+		})
+	}
+	saltGen, _ := nanoid.Standard(8)
+	salt := saltGen()
+	hashBytes := argon2.Key([]byte(userData.Password), []byte(salt), 3, 32*1024, 4, 32)
+	passwordHash := base64.StdEncoding.EncodeToString(hashBytes)
+	user := &models.User{
+		ID: uuid.New(),
+		Email: userData.Email,
+		Name: userData.Name,
+		PasswordHash: passwordHash,
+		Salt: salt,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	if err := db.CreateUser(*user); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:    fiber.StatusInternalServerError,
+			Message: "Failed to create user",
+			DevMessage: err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(user)
 }
 
 // GetCurrentUser godoc

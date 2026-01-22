@@ -17,8 +17,13 @@ func main() {
 		return c.SendString("This is the gmarket api.")
 	})
 
-	routes.SwaggerRoute(app)
-	routes.NotFoundRoute(app)
+	api := fiber.New()
+	app.Mount("/api", api)
+
+	routes.SwaggerRoute(api)
+	routes.UserRoute(api)
+
+	routes.NotFoundRoute(api)
 
 	app.Listen(":3000")
 }

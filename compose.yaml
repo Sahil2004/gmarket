@@ -13,8 +13,8 @@ services:
             dockerfile: ./Dockerfile.server
         ports:
             - 3000:3000
-        environment:
-            - DATABASE_URL=postgres://sahil:password@db:5432/gmarket
+        env_file:
+            - ./server/.env
         depends_on:
             - db
     db:
