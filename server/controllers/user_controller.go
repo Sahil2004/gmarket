@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/base64"
 	"time"
 
 	"github.com/Sahil2004/gmarket/server/database"
@@ -39,13 +40,16 @@ func CreateUser(c *fiber.Ctx) error {
 			DevMessage: err.Error(),
 		})
 	}
-	salt, _ := nanoid.Standard(8)
+	saltGen, _ := nanoid.Standard(8)
+	salt := saltGen()
+	hashBytes := argon2.Key([]byte(userData.Password), []byte(salt), 3, 32*1024, 4, 32)
+	passwordHash := base64.StdEncoding.EncodeToString(hashBytes)
 	user := &models.User{
 		ID: uuid.New(),
 		Email: userData.Email,
 		Name: userData.Name,
-		PasswordHash: string(argon2.Key([]byte(userData.Password), []byte(salt()), 3, 32*1024, 4, 32)),
-		Salt: salt(),
+		PasswordHash: passwordHash,
+		Salt: salt,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
