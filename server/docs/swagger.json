@@ -9,6 +9,72 @@
     "host": "localhost:3000",
     "basePath": "/api",
     "paths": {
+        "/sessions": {
+            "post": {
+                "description": "Create a new session for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sessions"
+                ],
+                "summary": "Create a new session (login)",
+                "parameters": [
+                    {
+                        "description": "User Login Data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateSessionDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SessionDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete the current session for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sessions"
+                ],
+                "summary": "Delete the current session (logout)",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
         "/users": {
             "get": {
                 "description": "Retrieve information about the currently authenticated user",
@@ -90,6 +156,19 @@
         }
     },
     "definitions": {
+        "dtos.CreateSessionDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "john@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "strongpassword123"
+                }
+            }
+        },
         "dtos.ErrorDTO": {
             "type": "object",
             "properties": {
@@ -97,9 +176,25 @@
                     "type": "integer",
                     "example": 400
                 },
+                "dev_message": {
+                    "type": "string",
+                    "example": "Invalid request body format"
+                },
                 "message": {
                     "type": "string",
                     "example": "Bad Request"
+                }
+            }
+        },
+        "dtos.SessionDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "user": {
+                    "$ref": "#/definitions/dtos.UserDTO"
                 }
             }
         },
