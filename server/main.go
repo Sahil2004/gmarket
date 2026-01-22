@@ -21,6 +21,7 @@ func main() {
 	app.Mount("/api", api)
 
 	routes.SwaggerRoute(api)
+	routes.SessionRoute(api)
 	routes.UserRoute(api)
 
 	routes.NotFoundRoute(api)
