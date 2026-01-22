@@ -27,7 +27,8 @@ func CreateUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
 			Code:    fiber.StatusInternalServerError,
-			Message: "Failed to connect to the database",
+			Message: "Failed to connect to database",
+			DevMessage: err.Error(),
 		})
 	}
 	userData := &dtos.UserRegistrationDTO{}
@@ -35,6 +36,7 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
 			Code:    fiber.StatusBadRequest,
 			Message: "Invalid request body",
+			DevMessage: err.Error(),
 		})
 	}
 	salt, _ := nanoid.Standard(8)
@@ -52,6 +54,7 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
 			Code:    fiber.StatusInternalServerError,
 			Message: "Failed to create user",
+			DevMessage: err.Error(),
 		})
 	}
 
