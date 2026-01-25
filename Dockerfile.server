@@ -13,6 +13,7 @@ RUN go build -ldflags="-s -w" -o /gmarket-server
 
 FROM scratch
 
+COPY --from=builder /server/data /data
 COPY --from=builder ["/gmarket-server", "/server/.env", "/"]
 
 EXPOSE 3000
