@@ -1,13 +1,33 @@
 basePath: /api
 definitions:
+  dtos.CreateSessionDTO:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      password:
+        example: strongpassword123
+        type: string
+    type: object
   dtos.ErrorDTO:
     properties:
       code:
         example: 400
         type: integer
+      dev_message:
+        example: Invalid request body format
+        type: string
       message:
         example: Bad Request
         type: string
+    type: object
+  dtos.SessionDTO:
+    properties:
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      user:
+        $ref: '#/definitions/dtos.UserDTO'
     type: object
   dtos.UserDTO:
     properties:
@@ -52,6 +72,48 @@ info:
   title: GMarket API
   version: "1.0"
 paths:
+  /sessions:
+    delete:
+      description: Delete the current session for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      security:
+      - BearerAuth: []
+      summary: Delete the current session (logout)
+      tags:
+      - sessions
+    post:
+      consumes:
+      - application/json
+      description: Create a new session for a user
+      parameters:
+      - description: User Login Data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateSessionDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.SessionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Create a new session (login)
+      tags:
+      - sessions
   /users:
     delete:
       description: Delete the currently authenticated user

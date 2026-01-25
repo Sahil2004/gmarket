@@ -3,13 +3,13 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"os"
 
+	"github.com/Sahil2004/gmarket/server/config"
 	_ "github.com/lib/pq"
 )
 
 func PostgresDBConnection() (*sql.DB, error) {
-	connStr := os.Getenv("DATABASE_URL")
+	connStr := config.AppConfig().DatabaseURL
 	if connStr == "" {
 		return nil, fmt.Errorf("Error: DATABASE_URL is not set in environment variables")
 	}

@@ -1,16 +1,14 @@
 package controllers
 
 import (
-	"encoding/base64"
 	"time"
 
 	"github.com/Sahil2004/gmarket/server/database"
 	"github.com/Sahil2004/gmarket/server/dtos"
 	"github.com/Sahil2004/gmarket/server/models"
+	"github.com/Sahil2004/gmarket/server/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/jaevor/go-nanoid"
-	"golang.org/x/crypto/argon2"
 )
 
 // CreateUser godoc
@@ -27,37 +25,34 @@ func CreateUser(c *fiber.Ctx) error {
 	db, err := database.OpenDBConnection()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusInternalServerError,
-			Message: "Failed to connect to database",
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to connect to database",
 			DevMessage: err.Error(),
 		})
 	}
 	userData := &dtos.UserRegistrationDTO{}
 	if err := c.BodyParser(userData); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusBadRequest,
-			Message: "Invalid request body",
+			Code:       fiber.StatusBadRequest,
+			Message:    "Invalid request body",
 			DevMessage: err.Error(),
 		})
 	}
-	saltGen, _ := nanoid.Standard(8)
-	salt := saltGen()
-	hashBytes := argon2.Key([]byte(userData.Password), []byte(salt), 3, 32*1024, 4, 32)
-	passwordHash := base64.StdEncoding.EncodeToString(hashBytes)
+	passwordHash, salt := utils.HashPassword(userData.Password)
 	user := &models.User{
-		ID: uuid.New(),
-		Email: userData.Email,
-		Name: userData.Name,
+		ID:           uuid.New(),
+		Email:        userData.Email,
+		Name:         userData.Name,
 		PasswordHash: passwordHash,
-		Salt: salt,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		Salt:         salt,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	if err := db.CreateUser(*user); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusInternalServerError,
-			Message: "Failed to create user",
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to create user",
 			DevMessage: err.Error(),
 		})
 	}
@@ -73,7 +68,7 @@ func CreateUser(c *fiber.Ctx) error {
 // @Failure 401 {object} dtos.ErrorDTO
 // @Router /users [get]
 func GetCurrentUser(c *fiber.Ctx) error {
-	return c.SendString("Get Current User")
+	return c.JSON(c.UserContext().Value("user"))
 }
 
 // DeleteCurrentUser godoc

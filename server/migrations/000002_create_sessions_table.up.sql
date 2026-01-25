@@ -1,0 +1,7 @@
+-- create sessions table
+CREATE TABLE IF NOT EXISTS sessions (
+    refresh_token VARCHAR(255) PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
