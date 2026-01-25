@@ -45,6 +45,16 @@ func AuthMiddleware(c *fiber.Ctx) error {
 					})
 				}
 
+				session, err := db.GetSessionByRefreshToken(refresh_token)
+
+				if err != nil || session.ExpiresAt.Before(time.Now()) {
+					return c.Status(fiber.StatusUnauthorized).JSON(dtos.ErrorDTO{
+						Code:       fiber.StatusUnauthorized,
+						Message:    "Session expired. Please log in again.",
+						DevMessage: "Invalid or expired refresh token.",
+					})
+				}
+
 				var userId uuid.UUID
 				userId, _ = uuid.Parse(claims["user_id"].(string))
 				user, err := db.GetUser(userId)

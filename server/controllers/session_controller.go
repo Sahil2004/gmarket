@@ -136,5 +136,28 @@ func CreateSession(c *fiber.Ctx) error {
 // @Failure 401 {object} dtos.ErrorDTO
 // @Router /sessions [delete]
 func DeleteCurrentSession(c *fiber.Ctx) error {
-	return c.SendString("Delete Current Session")
+	refreshToken := c.Cookies("refresh_token")
+
+	db, err := database.OpenDBConnection()
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to connect to database",
+			DevMessage: err.Error(),
+		})
+	}
+
+	if err := db.DeleteSession(refreshToken); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to delete session",
+			DevMessage: err.Error(),
+		})
+	}
+
+	c.ClearCookie("access_token")
+	c.ClearCookie("refresh_token")
+
+	return c.SendStatus(fiber.StatusOK)
 }
