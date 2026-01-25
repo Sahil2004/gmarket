@@ -11,7 +11,8 @@ COPY ./server/ .
 ENV CGO_ENABLED=0
 RUN go build -ldflags="-s -w" -o /gmarket-server
 
-FROM scratch
+FROM alpine:3.19
+RUN apk add --no-cache ca-certificates
 
 COPY --from=builder /server/data /data
 COPY --from=builder ["/gmarket-server", "/server/.env", "/"]
