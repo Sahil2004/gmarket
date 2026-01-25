@@ -37,3 +37,9 @@ func (db *UserQueries) CreateUser(user models.User) error {
 	_, err := db.Exec(query, user.ID, user.Email, user.Name, user.PasswordHash, user.Salt, user.ProfilePictureUrl, user.PhoneNumber, user.CreatedAt, user.UpdatedAt)
 	return err
 }
+
+func (db *UserQueries) DeleteUser(userId uuid.UUID) error {
+	query := `DELETE FROM users WHERE id = $1;`
+	_, err := db.Exec(query, userId)
+	return err
+}

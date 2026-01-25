@@ -80,5 +80,43 @@ func GetCurrentUser(c *fiber.Ctx) error {
 // @Failure 401 {object} dtos.ErrorDTO
 // @Router /users [delete]
 func DeleteCurrentUser(c *fiber.Ctx) error {
-	return c.SendString("Delete Current User")
+	user := c.UserContext().Value("user").(dtos.UserDTO)
+	db, err := database.OpenDBConnection()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to connect to database",
+			DevMessage: err.Error(),
+		})
+	}
+	if err := db.DeleteUser(user.ID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to delete user",
+			DevMessage: err.Error(),
+		})
+	}
+
+	expiredAccess := new(fiber.Cookie)
+	expiredAccess.Name = "access_token"
+	expiredAccess.Value = ""
+	expiredAccess.MaxAge = -1
+	expiredAccess.Path = "/"
+	expiredAccess.HTTPOnly = true
+	expiredAccess.SameSite = "Lax"
+	expiredAccess.Secure = false
+
+	expiredRefresh := new(fiber.Cookie)
+	expiredRefresh.Name = "refresh_token"
+	expiredRefresh.Value = ""
+	expiredRefresh.MaxAge = -1
+	expiredRefresh.Path = "/"
+	expiredRefresh.HTTPOnly = true
+	expiredRefresh.SameSite = "Lax"
+	expiredRefresh.Secure = false
+
+	c.Cookie(expiredAccess)
+	c.Cookie(expiredRefresh)
+
+	return c.SendStatus(fiber.StatusOK)
 }
