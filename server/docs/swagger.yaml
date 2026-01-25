@@ -26,6 +26,30 @@ definitions:
       user:
         $ref: '#/definitions/dtos.UserDTO'
     type: object
+  dtos.SymbolDTO:
+    properties:
+      exchange:
+        example: NSE
+        type: string
+      symbol:
+        example: RELIANCE
+        type: string
+    type: object
+  dtos.SymbolInfo:
+    properties:
+      exchange:
+        example: NSE
+        type: string
+      last_close_price:
+        example: 2430.5
+        type: number
+      ltp:
+        example: 2450.75
+        type: number
+      symbol:
+        example: RELIANCE
+        type: string
+    type: object
   dtos.UserDTO:
     properties:
       created_at:
@@ -61,6 +85,16 @@ definitions:
       password:
         example: strongpassword123
         type: string
+    type: object
+  dtos.WatchlistDTO:
+    properties:
+      index:
+        example: 1
+        type: integer
+      symbols:
+        items:
+          $ref: '#/definitions/dtos.SymbolInfo'
+        type: array
     type: object
 host: localhost:3000
 info:
@@ -229,4 +263,110 @@ paths:
       summary: Create a new user
       tags:
       - users
+  /watchlists/{watchlist_idx}:
+    get:
+      description: Retrieve the specified watchlist for the authenticated user
+      parameters:
+      - description: Watchlist Index (1-10)
+        in: path
+        name: watchlist_idx
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.WatchlistDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Get a user's watchlist
+      tags:
+      - watchlists
+  /watchlists/{watchlist_idx}/symbols:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a stock symbol from the specified watchlist for the authenticated
+        user
+      parameters:
+      - description: Watchlist Index (1-10)
+        in: path
+        name: watchlist_idx
+        required: true
+        type: integer
+      - description: Symbol to remove
+        in: body
+        name: symbol
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.SymbolDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Remove a symbol from a user's watchlist
+      tags:
+      - watchlists
+    post:
+      consumes:
+      - application/json
+      description: Add a stock symbol to the specified watchlist for the authenticated
+        user
+      parameters:
+      - description: Watchlist Index (1-10)
+        in: path
+        name: watchlist_idx
+        required: true
+        type: integer
+      - description: Symbol to add
+        in: body
+        name: symbol
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.SymbolDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Add a symbol to a user's watchlist
+      tags:
+      - watchlists
 swagger: "2.0"
