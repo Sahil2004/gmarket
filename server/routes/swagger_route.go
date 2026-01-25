@@ -10,7 +10,7 @@ func SwaggerRoute(a *fiber.App) {
 	router := a.Group("/swagger")
 
 	router.Get("/", func (c *fiber.Ctx) error {
-		return c.Redirect("/swagger/index.html")
+		return c.Redirect("/api/swagger/index.html")
 	})
 
 	router.Get("/*", fiberSwagger.WrapHandler)
