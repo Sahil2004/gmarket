@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"time"
+
 	"github.com/Sahil2004/gmarket/server/database"
 	"github.com/Sahil2004/gmarket/server/dtos"
+	"github.com/Sahil2004/gmarket/server/models"
 	"github.com/Sahil2004/gmarket/server/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -81,10 +84,8 @@ func CreateSession(c *fiber.Ctx) error {
 	accessTokenCookie.SameSite = "Lax"
 	accessTokenCookie.Secure = false // ! set true in production with HTTPS
 
-	refreshTokenCookie := new(fiber.Cookie)
-	refreshTokenCookie.Name = "refresh_token"
-	refreshTokenCookie.Value, err = utils.GenerateRefreshToken(user)
-	
+	refreshToken, err := utils.GenerateRefreshToken(user.ID.String())
+
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
 			Code:    fiber.StatusInternalServerError,
@@ -93,17 +94,35 @@ func CreateSession(c *fiber.Ctx) error {
 		})
 	}
 
+	refreshTokenCookie := new(fiber.Cookie)
+	refreshTokenCookie.Name = "refresh_token"
+	refreshTokenCookie.Value = refreshToken
 	refreshTokenCookie.MaxAge = 7 * 24 * 60 * 60 // 7 days
 	refreshTokenCookie.HTTPOnly = true
 	refreshTokenCookie.Path = "/"
 	refreshTokenCookie.SameSite = "Lax"
 	refreshTokenCookie.Secure = false // ! set true in production with HTTPS
 
+	session := models.Session{
+		RefreshToken: refreshToken,
+		UserID: user.ID,
+		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
+		CreatedAt: time.Now(),
+	}
+
+	if err := db.CreateSession(session); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:    fiber.StatusInternalServerError,
+			Message: "Failed to create session",
+			DevMessage: err.Error(),
+		})
+	}
+
+
 	c.Cookie(accessTokenCookie)
 	c.Cookie(refreshTokenCookie)
 
 	return c.Status(fiber.StatusCreated).JSON(dtos.SessionDTO{
-		ID: "1",
 		User: user,
 	})
 }

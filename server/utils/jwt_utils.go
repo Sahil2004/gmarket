@@ -25,9 +25,9 @@ func GenerateAccessToken(user dtos.UserDTO) (string, error) {
 	return t, nil
 }
 
-func GenerateRefreshToken(user dtos.UserDTO) (string, error) {
+func GenerateRefreshToken(userId string) (string, error) {
 	claims := jwt.MapClaims{
-		"user": user,
+		"user_id": userId,
 		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
 	}
 
@@ -40,4 +40,24 @@ func GenerateRefreshToken(user dtos.UserDTO) (string, error) {
 	}
 
 	return t, nil
+}
+
+func ValidateTokens(accessToken string, refreshToken string) (*jwt.Token, *jwt.Token, error) {
+	refreshTokenParsed, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.AppConfig().RefreshSecret), nil
+	})
+	
+	if err != nil {
+		return nil, nil, err
+	}
+
+	accessTokenParsed, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.AppConfig().AccessSecret), nil
+	})
+
+	if err != nil {
+		return nil, refreshTokenParsed, err
+	}
+
+	return accessTokenParsed, refreshTokenParsed, nil
 }

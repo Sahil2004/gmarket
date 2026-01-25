@@ -6,6 +6,7 @@ import (
 
 type Queries struct {
 	*queries.UserQueries
+	*queries.SessionQueries
 }
 
 func OpenDBConnection() (*Queries, error) {
