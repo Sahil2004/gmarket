@@ -156,8 +156,26 @@ func DeleteCurrentSession(c *fiber.Ctx) error {
 		})
 	}
 
-	c.ClearCookie("access_token")
-	c.ClearCookie("refresh_token")
+	expiredAccess := new(fiber.Cookie)
+	expiredAccess.Name = "access_token"
+	expiredAccess.Value = ""
+	expiredAccess.MaxAge = -1
+	expiredAccess.Path = "/"
+	expiredAccess.HTTPOnly = true
+	expiredAccess.SameSite = "Lax"
+	expiredAccess.Secure = false
+
+	expiredRefresh := new(fiber.Cookie)
+	expiredRefresh.Name = "refresh_token"
+	expiredRefresh.Value = ""
+	expiredRefresh.MaxAge = -1
+	expiredRefresh.Path = "/"
+	expiredRefresh.HTTPOnly = true
+	expiredRefresh.SameSite = "Lax"
+	expiredRefresh.Secure = false
+
+	c.Cookie(expiredAccess)
+	c.Cookie(expiredRefresh)
 
 	return c.SendStatus(fiber.StatusOK)
 }
