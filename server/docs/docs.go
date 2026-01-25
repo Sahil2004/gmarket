@@ -15,6 +15,32 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/market/symbols": {
+            "get": {
+                "description": "GetSymbols serves the list of market symbols from a static JSON file.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Market"
+                ],
+                "summary": "Get Market Symbols",
+                "responses": {
+                    "200": {
+                        "description": "../data/stocks.json",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/sessions": {
             "post": {
                 "description": "Create a new session for a user",
@@ -73,12 +99,7 @@ const docTemplate = `{
                             "$ref": "#/definitions/dtos.ErrorDTO"
                         }
                     }
-                },
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/users": {
@@ -195,10 +216,6 @@ const docTemplate = `{
         "dtos.SessionDTO": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "string",
-                    "example": "550e8400-e29b-41d4-a716-446655440000"
-                },
                 "user": {
                     "$ref": "#/definitions/dtos.UserDTO"
                 }

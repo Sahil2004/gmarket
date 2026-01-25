@@ -130,7 +130,6 @@ func CreateSession(c *fiber.Ctx) error {
 // @Summary Delete the current session (logout)
 // @Description Delete the current session for the authenticated user
 // @Tags sessions
-// @Security BearerAuth
 // @Produce json
 // @Success 200
 // @Failure 401 {object} dtos.ErrorDTO

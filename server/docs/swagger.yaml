@@ -23,9 +23,6 @@ definitions:
     type: object
   dtos.SessionDTO:
     properties:
-      id:
-        example: 550e8400-e29b-41d4-a716-446655440000
-        type: string
       user:
         $ref: '#/definitions/dtos.UserDTO'
     type: object
@@ -72,6 +69,24 @@ info:
   title: GMarket API
   version: "1.0"
 paths:
+  /market/symbols:
+    get:
+      description: GetSymbols serves the list of market symbols from a static JSON
+        file.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ../data/stocks.json
+          schema:
+            type: file
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Get Market Symbols
+      tags:
+      - Market
   /sessions:
     delete:
       description: Delete the current session for the authenticated user
@@ -84,8 +99,6 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/dtos.ErrorDTO'
-      security:
-      - BearerAuth: []
       summary: Delete the current session (logout)
       tags:
       - sessions
