@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"encoding/json"
-
 	"github.com/Sahil2004/gmarket/server/dtos"
+	"github.com/Sahil2004/gmarket/server/utils"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v3/client"
 )
 
 // GetSymbols godoc
@@ -47,31 +45,12 @@ func GetChartData(c *fiber.Ctx) error {
 		})
 	}
 
-	var exchangeSymbol string
-	switch exchange {
-	case "NSE":
-		exchangeSymbol = symbol + ".NS"
-	default:
-		exchangeSymbol = symbol
-	}
-	url := "https://query1.finance.yahoo.com/v8/finance/chart/" + exchangeSymbol + "?range=" + chartRange + "&interval=" + interval
-
-	res, err := client.Get(url)
-
+	exchangeSymbol := utils.GetStockSymbolWithExchange(symbol, exchange)
+	result, err := utils.GetExchangeData(exchangeSymbol, chartRange, interval)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
 			Code:       fiber.StatusInternalServerError,
 			Message:    "Failed to fetch chart data",
-			DevMessage: err.Error(),
-		})
-	}
-
-	var result map[string]interface{}
-
-	if err := json.Unmarshal(res.Body(), &result); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Failed to parse chart data",
 			DevMessage: err.Error(),
 		})
 	}

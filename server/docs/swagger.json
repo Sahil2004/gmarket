@@ -244,6 +244,163 @@
                     }
                 }
             }
+        },
+        "/watchlists/{watchlist_idx}": {
+            "get": {
+                "description": "Retrieve the specified watchlist for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "watchlists"
+                ],
+                "summary": "Get a user's watchlist",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Watchlist Index (1-10)",
+                        "name": "watchlist_idx",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.WatchlistDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/watchlists/{watchlist_idx}/symbols": {
+            "post": {
+                "description": "Add a stock symbol to the specified watchlist for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "watchlists"
+                ],
+                "summary": "Add a symbol to a user's watchlist",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Watchlist Index (1-10)",
+                        "name": "watchlist_idx",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Symbol to add",
+                        "name": "symbol",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SymbolDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove a stock symbol from the specified watchlist for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "watchlists"
+                ],
+                "summary": "Remove a symbol from a user's watchlist",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Watchlist Index (1-10)",
+                        "name": "watchlist_idx",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Symbol to remove",
+                        "name": "symbol",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SymbolDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -282,6 +439,40 @@
             "properties": {
                 "user": {
                     "$ref": "#/definitions/dtos.UserDTO"
+                }
+            }
+        },
+        "dtos.SymbolDTO": {
+            "type": "object",
+            "properties": {
+                "exchange": {
+                    "type": "string",
+                    "example": "NSE"
+                },
+                "symbol": {
+                    "type": "string",
+                    "example": "RELIANCE"
+                }
+            }
+        },
+        "dtos.SymbolInfo": {
+            "type": "object",
+            "properties": {
+                "exchange": {
+                    "type": "string",
+                    "example": "NSE"
+                },
+                "last_close_price": {
+                    "type": "number",
+                    "example": 2430.5
+                },
+                "ltp": {
+                    "type": "number",
+                    "example": 2450.75
+                },
+                "symbol": {
+                    "type": "string",
+                    "example": "RELIANCE"
                 }
             }
         },
@@ -332,6 +523,21 @@
                 "password": {
                     "type": "string",
                     "example": "strongpassword123"
+                }
+            }
+        },
+        "dtos.WatchlistDTO": {
+            "type": "object",
+            "properties": {
+                "index": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "symbols": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.SymbolInfo"
+                    }
                 }
             }
         }

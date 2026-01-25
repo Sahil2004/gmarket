@@ -10,4 +10,6 @@ func WatchlistRoute(a *fiber.App) {
 	watchlistRouter := a.Group("/watchlists")
 
 	watchlistRouter.Get("/:watchlist_idx", middlewares.AuthMiddleware, controllers.GetWatchlist)
+	watchlistRouter.Post("/:watchlist_idx/symbols", middlewares.AuthMiddleware, controllers.AddSymbolToWatchlist)
+	watchlistRouter.Delete("/:watchlist_idx/symbols", middlewares.AuthMiddleware, controllers.RemoveSymbolFromWatchlist)
 }
