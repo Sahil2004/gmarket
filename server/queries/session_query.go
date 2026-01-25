@@ -11,7 +11,7 @@ type SessionQueries struct {
 }
 
 func (db *SessionQueries) CreateSession(session models.Session) error {
-	query := `INSERT INTO sessions (user_id, refresh_token, created_at, expires_at) VALUES ($1, $2, $3, $4, $5)`
+	query := `INSERT INTO sessions (user_id, refresh_token, created_at, expires_at) VALUES ($1, $2, $3, $4)`
 	_, err := db.Exec(query, session.UserID, session.RefreshToken, session.CreatedAt, session.ExpiresAt)
 	return err
 }

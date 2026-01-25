@@ -17,6 +17,7 @@ func OpenDBConnection() (*Queries, error) {
 	}
 
 	return &Queries{
-		UserQueries: &queries.UserQueries{DB: db},
+		UserQueries:    &queries.UserQueries{DB: db},
+		SessionQueries: &queries.SessionQueries{DB: db},
 	}, nil
 }

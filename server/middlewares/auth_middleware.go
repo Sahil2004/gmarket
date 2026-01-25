@@ -96,8 +96,43 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	if claims, ok := accessTokenClaims.Claims.(jwt.MapClaims); ok && accessTokenClaims.Valid {
-		var user dtos.UserDTO
-		user = claims["user"].(dtos.UserDTO)
+
+		userMap, ok := claims["user"].(map[string]interface{})
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(dtos.ErrorDTO{
+				Code:       fiber.StatusUnauthorized,
+				Message:    "Invalid token payload",
+				DevMessage: "User claim is not an object",
+			})
+		}
+
+		createdAt, err := time.Parse(time.RFC3339, userMap["created_at"].(string))
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(dtos.ErrorDTO{
+				Code:       fiber.StatusUnauthorized,
+				Message:    "Invalid token payload",
+				DevMessage: "CreatedAt parsing error: " + err.Error(),
+			})
+		}
+		updatedAt, err := time.Parse(time.RFC3339, userMap["updated_at"].(string))
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(dtos.ErrorDTO{
+				Code:       fiber.StatusUnauthorized,
+				Message:    "Invalid token payload",
+				DevMessage: "UpdatedAt parsing error: " + err.Error(),
+			})
+		}
+
+		user := dtos.UserDTO{
+			ID:                uuid.MustParse(userMap["id"].(string)),
+			Email:             userMap["email"].(string),
+			Name:              userMap["name"].(string),
+			ProfilePictureUrl: userMap["profile_picture_url"].(string),
+			PhoneNumber:       userMap["phone_number"].(string),
+			CreatedAt:         createdAt,
+			UpdatedAt:         updatedAt,
+		}
+
 		userCtx := context.WithValue(c.UserContext(), "user", user)
 		c.SetUserContext(userCtx)
 		return c.Next()
@@ -105,7 +140,6 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusUnauthorized).JSON(dtos.ErrorDTO{
 		Code:       fiber.StatusUnauthorized,
-		Message:    "Access not allowed. Invalid access token.",
 		DevMessage: "Unauthorized: Invalid access token claims.",
 	})
 }
