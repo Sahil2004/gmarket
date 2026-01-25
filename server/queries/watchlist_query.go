@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/Sahil2004/gmarket/server/models"
+	"github.com/lib/pq"
 )
 
 type WatchlistQueries struct {
@@ -13,7 +14,7 @@ type WatchlistQueries struct {
 func (db *WatchlistQueries) GetWatchlist(userID string, watchlistIdx int) (models.Watchlist, error) {
 	watchlist := models.Watchlist{}
 	query := `SELECT user_id, watchlist_idx, symbols, updated_at FROM watchlists WHERE user_id = $1 AND watchlist_idx = $2`
-	err := db.QueryRow(query, userID, watchlistIdx).Scan(&watchlist.UserID, &watchlist.WatchlistIdx, &watchlist.Symbols, &watchlist.UpdatedAt)
+	err := db.QueryRow(query, userID, watchlistIdx).Scan(&watchlist.UserID, &watchlist.WatchlistIdx, pq.Array(&watchlist.Symbols), &watchlist.UpdatedAt)
 	if err != nil {
 		return watchlist, err
 	}
