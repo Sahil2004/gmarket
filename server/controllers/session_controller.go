@@ -24,8 +24,8 @@ func CreateSession(c *fiber.Ctx) error {
 	loginData := &dtos.CreateSessionDTO{}
 	if err := c.BodyParser(loginData); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusBadRequest,
-			Message: "Invalid login details",
+			Code:       fiber.StatusBadRequest,
+			Message:    "Invalid login details",
 			DevMessage: err.Error(),
 		})
 	}
@@ -33,8 +33,8 @@ func CreateSession(c *fiber.Ctx) error {
 	db, err := database.OpenDBConnection()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusInternalServerError,
-			Message: "Failed to connect to database",
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to connect to database",
 			DevMessage: err.Error(),
 		})
 	}
@@ -42,28 +42,28 @@ func CreateSession(c *fiber.Ctx) error {
 	userData, err := db.GetUserByEmail(loginData.Email)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
-			Code:   fiber.StatusBadRequest,
-			Message: "Unable to get that user",
+			Code:       fiber.StatusBadRequest,
+			Message:    "Unable to get that user",
 			DevMessage: err.Error(),
 		})
 	}
 
 	if !utils.ValidatePassword(loginData.Password, userData.Salt, userData.PasswordHash) {
 		return c.Status(fiber.StatusUnauthorized).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusUnauthorized,
-			Message: "Invalid credentials",
+			Code:       fiber.StatusUnauthorized,
+			Message:    "Invalid credentials",
 			DevMessage: "Password and the hash do not match.",
 		})
 	}
 
 	user := dtos.UserDTO{
-		ID:   userData.ID,
-		Email: userData.Email,
-		Name: userData.Name,
+		ID:                userData.ID,
+		Email:             userData.Email,
+		Name:              userData.Name,
 		ProfilePictureUrl: userData.ProfilePictureUrl,
-		PhoneNumber: userData.PhoneNumber,
-		CreatedAt: userData.CreatedAt,
-		UpdatedAt: userData.UpdatedAt,
+		PhoneNumber:       userData.PhoneNumber,
+		CreatedAt:         userData.CreatedAt,
+		UpdatedAt:         userData.UpdatedAt,
 	}
 
 	accessTokenCookie := new(fiber.Cookie)
@@ -72,8 +72,8 @@ func CreateSession(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusInternalServerError,
-			Message: "Failed to generate access token",
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to generate access token",
 			DevMessage: err.Error(),
 		})
 	}
@@ -88,8 +88,8 @@ func CreateSession(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusInternalServerError,
-			Message: "Failed to generate refresh token",
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to generate refresh token",
 			DevMessage: err.Error(),
 		})
 	}
@@ -103,21 +103,20 @@ func CreateSession(c *fiber.Ctx) error {
 	refreshTokenCookie.SameSite = "Lax"
 	refreshTokenCookie.Secure = false // ! set true in production with HTTPS
 
-	session := models.Session{
+	session := &models.Session{
 		RefreshToken: refreshToken,
-		UserID: user.ID,
-		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
-		CreatedAt: time.Now(),
+		UserID:       user.ID,
+		ExpiresAt:    time.Now().Add(7 * 24 * time.Hour),
+		CreatedAt:    time.Now(),
 	}
 
-	if err := db.CreateSession(session); err != nil {
+	if err := db.CreateSession(*session); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:    fiber.StatusInternalServerError,
-			Message: "Failed to create session",
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to create session",
 			DevMessage: err.Error(),
 		})
 	}
-
 
 	c.Cookie(accessTokenCookie)
 	c.Cookie(refreshTokenCookie)
