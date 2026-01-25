@@ -32,6 +32,7 @@ func main() {
 	routes.SessionRoute(api)
 	routes.UserRoute(api)
 	routes.MarketRoute(api)
+	routes.WatchlistRoute(api)
 
 	routes.NotFoundRoute(api)
 
