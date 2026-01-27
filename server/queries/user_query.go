@@ -13,8 +13,18 @@ type UserQueries struct {
 
 func (db *UserQueries) GetUser(userID uuid.UUID) (models.User, error) {
 	user := models.User{}
-	query := `SELECT id, email, password_hash, salt, created_at, updated_at FROM users WHERE id = $1`
-	err := db.QueryRow(query, userID).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Salt, &user.CreatedAt, &user.UpdatedAt)
+	query := `SELECT id, email, name, password_hash, salt, profile_picture_url, phone_number, created_at, updated_at FROM users WHERE id = $1`
+	err := db.QueryRow(query, userID).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Name,
+		&user.PasswordHash,
+		&user.Salt,
+		&user.ProfilePictureUrl,
+		&user.PhoneNumber,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
 	if err != nil {
 		return user, err
 	}
