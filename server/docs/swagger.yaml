@@ -1,5 +1,14 @@
 basePath: /api
 definitions:
+  dtos.ChangePasswordDTO:
+    properties:
+      new_password:
+        example: newstrongpassword456
+        type: string
+      old_password:
+        example: oldpassword123
+        type: string
+    type: object
   dtos.CreateSessionDTO:
     properties:
       email:
@@ -261,6 +270,38 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorDTO'
       summary: Create a new user
+      tags:
+      - users
+  /users/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Change the password of the currently authenticated user
+      parameters:
+      - description: Change Password Data
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.ChangePasswordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Change user password
       tags:
       - users
   /watchlists/{watchlist_idx}:

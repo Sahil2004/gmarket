@@ -12,4 +12,5 @@ func UserRoute(a *fiber.App) {
 	userRouter.Post("/", controllers.CreateUser)
 	userRouter.Get("/", middlewares.AuthMiddleware, controllers.GetCurrentUser)
 	userRouter.Delete("/", middlewares.AuthMiddleware, controllers.DeleteCurrentUser)
+	userRouter.Post("/change-password", middlewares.AuthMiddleware, controllers.ChangePassword)
 }

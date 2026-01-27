@@ -20,3 +20,13 @@ func ValidatePassword(password, salt, passwordHash string) bool {
 	computedHash := base64.StdEncoding.EncodeToString(hashBytes)
 	return computedHash == passwordHash
 }
+
+func VerifyNewPassword(oldPassword string, newPassword string, salt string, passwordHash string) bool {
+	if !ValidatePassword(oldPassword, salt, passwordHash) {
+		return false
+	}
+	if oldPassword == newPassword {
+		return false
+	}
+	return true
+}
