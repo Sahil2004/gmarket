@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../guards';
-import { stockResolver } from '../resolvers';
+import { stockResolver, userResolver } from '../resolvers';
 
 export const routes: Routes = [
   {
@@ -26,6 +26,9 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () => import('../routes').then((m) => m.Profile),
+        resolve: {
+          userData: userResolver,
+        },
       },
     ],
   },

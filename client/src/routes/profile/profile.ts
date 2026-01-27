@@ -4,7 +4,7 @@ import { ChangePasswordDialog, ConfirmationDialog, InputImage } from '../../comp
 import { UserService } from '../../services/user.service';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import type { IUserDataClient } from '../../types/user-data.types';
+import type { IUserData } from '../../types/user-data.types';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -31,7 +31,7 @@ export class Profile {
   readonly _dialog = inject(MatDialog);
 
   get currentUser() {
-    return this.userService.currentUser as IUserDataClient;
+    return this.userService.currentUser;
   }
 
   profilePhotoUri = signal<string | null>(this.currentUser.profilePhotoUri || null);
