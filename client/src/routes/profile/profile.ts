@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { ChangePasswordDialog, ConfirmationDialog, InputImage } from '../../components';
 import { UserService } from '../../services/user.service';
@@ -8,8 +8,9 @@ import type { IUserData } from '../../types/user-data.types';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'profile',
@@ -30,26 +31,24 @@ export class Profile {
   readonly _snackBar = inject(MatSnackBar);
   readonly _dialog = inject(MatDialog);
 
-  get currentUser() {
-    return this.userService.currentUser;
-  }
+  private route = inject(ActivatedRoute);
+  private data = toSignal(this.route.data);
 
-  profilePhotoUri = signal<string | null>(this.currentUser.profilePhotoUri || null);
+  user = computed(() => this.data()?.['userData'] as IUserData);
+
+  profilePhotoUri = signal<string | null>(this.user().profile_picture_url || null);
 
   get nameInitials(): string {
-    if (!this.currentUser) return '';
-    const nameArr = this.currentUser.name.split(' ');
+    if (!this.user()) return '';
+    const nameArr = this.user().name.split(' ');
     const initials = nameArr.map((n) => n.charAt(0).toUpperCase());
     return initials.join('');
   }
 
   profileForm = this.fb.group({
-    name: [this.currentUser.name, [Validators.required]],
-    email: [this.currentUser.email, [Validators.required, Validators.email]],
-    phoneNumber: [
-      this.currentUser.phoneNumber,
-      [Validators.minLength(10), Validators.maxLength(10)],
-    ],
+    name: [this.user().name, [Validators.required]],
+    email: [this.user().email, [Validators.required, Validators.email]],
+    phoneNumber: [this.user().phone_number, [Validators.minLength(10), Validators.maxLength(10)]],
   });
 
   get name() {
@@ -84,7 +83,7 @@ export class Profile {
 
   updateProfilePhoto() {
     return (newImage: string) => {
-      const profile = this.userService.updateProfile({ profilePhotoUri: newImage });
+      const profile = this.userService.updateProfile({ profile_picture_url: newImage });
       if (!profile) {
         let snackBarRef = this._snackBar.open('Failed to update profile photo', 'Close', {
           duration: 3000,
@@ -100,7 +99,7 @@ export class Profile {
       snackBarRef.onAction().subscribe(() => {
         snackBarRef.dismiss();
       });
-      this.profilePhotoUri.set(this.currentUser.profilePhotoUri || null);
+      this.profilePhotoUri.set(this.user().profile_picture_url || null);
       return true;
     };
   }
@@ -110,7 +109,7 @@ export class Profile {
       this.userService.updateProfile({
         name: this.name?.value as string,
         email: this.email?.value as string,
-        phoneNumber: this.phoneNumber?.value as number | undefined,
+        phone_number: this.phoneNumber?.value as number | undefined,
       });
       let snackBarRef = this._snackBar.open('Profile updated successfully', 'Close', {
         duration: 3000,

@@ -8,8 +8,8 @@
         [uploadHandler]="updateProfilePhoto()"
       ></input-image>
       <span>
-        <p class="text-3xl mt-6">{{ currentUser.name }}</p>
-        <p class="text-lg">Client Id: {{ currentUser.id }}</p>
+        <p class="text-3xl mt-6">{{ user().name }}</p>
+        <p class="text-lg">Client Id: {{ user().id }}</p>
       </span>
     </span>
   </mat-grid-tile>
