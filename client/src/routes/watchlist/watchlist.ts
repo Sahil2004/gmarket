@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Search, WatchlistTabs } from '../../components';
-import { StocksService, UserService } from '../../services';
+import { StocksService, WatchlistService } from '../../services';
 import { IStock } from '../../types/stocks.types';
 import type { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
@@ -15,11 +15,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class Watchlist implements OnInit {
   private stockService = inject(StocksService);
-  private userService = inject(UserService);
+  private watchlistService = inject(WatchlistService);
   private _snackBar = inject(MatSnackBar);
 
   currentWatchlistIdx = signal<number>(0);
-  watchlists = signal<string[][]>(this.currentUser?.watchlists ?? []);
+  // watchlists = signal<string[][]>(this.currentUser?.watchlists ?? []);
 
   stockList$!: Observable<IStock[] | undefined>;
 
@@ -27,43 +27,39 @@ export class Watchlist implements OnInit {
     this.stockList$ = this.stockService.getAllStocks();
   }
 
-  get currentUser() {
-    return this.userService.currentUser;
-  }
-
   getStockSymbols(stocks: IStock[]): string[] {
     return stocks.map((stock) => stock.symbol);
   }
 
   updateWatchlists() {
-    this.watchlists.set(this.currentUser?.watchlists ?? []);
+    // this.watchlists.set(this.currentUser?.watchlists ?? []);
   }
 
   addStockToWatchlist() {
     return (query: string) => {
       return this.stockService.isAStockSymbol(query).subscribe((decision) => {
-        if (decision) {
-          const res = this.userService.addStockToWatchlist(this.currentWatchlistIdx(), query);
-          if (!res) {
-            let snackBarRef = this._snackBar.open('Failed to add stock to watchlist', 'Close', {
-              duration: 3000,
-            });
-            snackBarRef.onAction().subscribe(() => {
-              snackBarRef.dismiss();
-            });
-            return false;
-          }
-          this.updateWatchlists();
-          return true;
-        } else {
-          let snackBarRef = this._snackBar.open('Stock symbol not found', 'Close', {
-            duration: 3000,
-          });
-          snackBarRef.onAction().subscribe(() => {
-            snackBarRef.dismiss();
-          });
-          return false;
-        }
+        // if (decision) {
+        //   const res = this.userService.addStockToWatchlist(this.currentWatchlistIdx(), query);
+        //   if (!res) {
+        //     let snackBarRef = this._snackBar.open('Failed to add stock to watchlist', 'Close', {
+        //       duration: 3000,
+        //     });
+        //     snackBarRef.onAction().subscribe(() => {
+        //       snackBarRef.dismiss();
+        //     });
+        //     return false;
+        //   }
+        //   this.updateWatchlists();
+        //   return true;
+        // } else {
+        //   let snackBarRef = this._snackBar.open('Stock symbol not found', 'Close', {
+        //     duration: 3000,
+        //   });
+        //   snackBarRef.onAction().subscribe(() => {
+        //     snackBarRef.dismiss();
+        //   });
+        //   return false;
+        // }
       });
     };
   }
@@ -82,18 +78,18 @@ export class Watchlist implements OnInit {
 
   removeFromWatchlistHandler() {
     return (stock: string) => {
-      const res = this.userService.removeStockFromWatchlist(this.currentWatchlistIdx(), stock);
-      if (!res) {
-        let snackBarRef = this._snackBar.open('Failed to remove stock from watchlist', 'Close', {
-          duration: 3000,
-        });
-        snackBarRef.onAction().subscribe(() => {
-          snackBarRef.dismiss();
-        });
-        return false;
-      }
-      this.updateWatchlists();
-      return true;
+      // const res = this.userService.removeStockFromWatchlist(this.currentWatchlistIdx(), stock);
+      // if (!res) {
+      //   let snackBarRef = this._snackBar.open('Failed to remove stock from watchlist', 'Close', {
+      //     duration: 3000,
+      //   });
+      //   snackBarRef.onAction().subscribe(() => {
+      //     snackBarRef.dismiss();
+      //   });
+      //   return false;
+      // }
+      // this.updateWatchlists();
+      // return true;
     };
   }
 
