@@ -13,8 +13,8 @@ type UserQueries struct {
 
 func (db *UserQueries) GetUser(userID uuid.UUID) (models.User, error) {
 	user := models.User{}
-	query := `SELECT id, email, password, created_at, updated_at FROM users WHERE id = $1`
-	err := db.QueryRow(query, userID).Scan(&user)
+	query := `SELECT id, email, password_hash, salt, created_at, updated_at FROM users WHERE id = $1`
+	err := db.QueryRow(query, userID).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Salt, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return user, err
 	}
@@ -41,5 +41,11 @@ func (db *UserQueries) CreateUser(user models.User) error {
 func (db *UserQueries) DeleteUser(userId uuid.UUID) error {
 	query := `DELETE FROM users WHERE id = $1;`
 	_, err := db.Exec(query, userId)
+	return err
+}
+
+func (db *UserQueries) UpdateUserPassword(userId uuid.UUID, newPasswordHash string, newSalt string, updatedAt string) error {
+	query := `UPDATE users SET password_hash = $1, salt = $2, updated_at = $3 WHERE id = $4;`
+	_, err := db.Exec(query, newPasswordHash, newSalt, updatedAt, userId)
 	return err
 }

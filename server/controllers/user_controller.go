@@ -120,3 +120,68 @@ func DeleteCurrentUser(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusOK)
 }
+
+// ChangePassword godoc
+// @Summary Change user password
+// @Description Change the password of the currently authenticated user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param password body dtos.ChangePasswordDTO true "Change Password Data"
+// @Success 200
+// @Failure 400 {object} dtos.ErrorDTO
+// @Failure 401 {object} dtos.ErrorDTO
+// @Failure 500 {object} dtos.ErrorDTO
+// @Router /users/change-password [post]
+func ChangePassword(c *fiber.Ctx) error {
+	passwordData := dtos.ChangePasswordDTO{}
+	if err := c.BodyParser(&passwordData); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusBadRequest,
+			Message:    "Invalid request body",
+			DevMessage: err.Error(),
+		})
+	}
+
+	userID := c.UserContext().Value("user").(dtos.UserDTO).ID
+
+	db, err := database.OpenDBConnection()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to connect to database",
+			DevMessage: err.Error(),
+		})
+	}
+
+	userData, err := db.GetUser(userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to retrieve user data",
+			DevMessage: err.Error(),
+		})
+	}
+
+	if !utils.VerifyNewPassword(passwordData.OldPassword, passwordData.NewPassword, userData.Salt, userData.PasswordHash) {
+		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusBadRequest,
+			Message:    "Old password is incorrect or new password is the same as the old password",
+			DevMessage: "Old password is incorrect or new password is the same as the old password",
+		})
+	}
+
+	newHash, newSalt := utils.HashPassword(passwordData.NewPassword)
+
+	updatedAt := time.Now().Format(time.RFC3339)
+
+	if err := db.UpdateUserPassword(userID, newHash, newSalt, updatedAt); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to update password",
+			DevMessage: err.Error(),
+		})
+	}
+
+	return c.SendStatus(fiber.StatusOK)
+}
