@@ -9,15 +9,17 @@ export const authGuard: CanActivateFn = (route, state) => {
   const authRoutes = ['login', 'register'];
   const currentUrlInAuthRoutes = authRoutes.some((r) => route.url.toString().includes(r));
   if (currentUrlInAuthRoutes) {
-    if (userService.isAuthenticated()) {
-      router.navigate(['/']);
-      return false;
-    }
+    userService.currentUser.subscribe((res) => {
+      if (!res.hasOwnProperty('id')) {
+        router.navigate(['/']);
+      }
+    });
     return true;
   }
-  if (!userService.isAuthenticated()) {
-    router.navigate(['/login']);
-    return false;
-  }
+  userService.currentUser.subscribe((res) => {
+    if (!res.hasOwnProperty('id')) {
+      router.navigate(['/login']);
+    }
+  });
   return true;
 };
