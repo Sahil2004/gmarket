@@ -50,8 +50,4 @@ export class UserService {
   deleteAccount(): Observable<null | IError> {
     return this.http.delete<null | IError>('/users');
   }
-
-  isAuthenticated(): boolean {
-    return this.user !== null;
-  }
 }

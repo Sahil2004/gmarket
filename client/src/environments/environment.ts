@@ -1,4 +1,5 @@
 export const environment = {
-  production: true,
+  production: false,
   APP_NAME: 'gmarket',
+  API_BASE_URI: 'http://localhost:3000/api',
 };
