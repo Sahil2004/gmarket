@@ -20,6 +20,7 @@ export class Watchlist implements OnInit {
 
   currentWatchlistIdx = signal<number>(0);
   // watchlists = signal<string[][]>(this.currentUser?.watchlists ?? []);
+  watchlists = signal<string[][]>([]);
 
   stockList$!: Observable<IStock[] | undefined>;
 
