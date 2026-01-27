@@ -59,6 +59,21 @@ definitions:
         example: RELIANCE
         type: string
     type: object
+  dtos.UpdateUserDTO:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phone_number:
+        example: "+1234567890"
+        type: string
+      profile_picture_url:
+        example: https://example.com/profile.jpg
+        type: string
+    type: object
   dtos.UserDTO:
     properties:
       created_at:
@@ -240,11 +255,48 @@ paths:
       produces:
       - application/json
       responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.UserDTO'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/dtos.ErrorDTO'
       summary: Get current user
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Update the information of the currently authenticated user
+      parameters:
+      - description: User Update Data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateUserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.UserDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Update current user information
       tags:
       - users
     post:

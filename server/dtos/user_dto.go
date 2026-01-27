@@ -26,3 +26,10 @@ type ChangePasswordDTO struct {
 	OldPassword string `json:"old_password" example:"oldpassword123"`
 	NewPassword string `json:"new_password" example:"newstrongpassword456"`
 }
+
+type UpdateUserDTO struct {
+	Email             *string `json:"email" example:"john@example.com"`
+	Name              *string `json:"name" example:"John Doe"`
+	ProfilePictureUrl *string `json:"profile_picture_url" example:"https://example.com/profile.jpg"`
+	PhoneNumber       *string `json:"phone_number" example:"+1234567890"`
+}

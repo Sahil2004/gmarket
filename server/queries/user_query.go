@@ -13,8 +13,18 @@ type UserQueries struct {
 
 func (db *UserQueries) GetUser(userID uuid.UUID) (models.User, error) {
 	user := models.User{}
-	query := `SELECT id, email, password_hash, salt, created_at, updated_at FROM users WHERE id = $1`
-	err := db.QueryRow(query, userID).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Salt, &user.CreatedAt, &user.UpdatedAt)
+	query := `SELECT id, email, name, password_hash, salt, profile_picture_url, phone_number, created_at, updated_at FROM users WHERE id = $1`
+	err := db.QueryRow(query, userID).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Name,
+		&user.PasswordHash,
+		&user.Salt,
+		&user.ProfilePictureUrl,
+		&user.PhoneNumber,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
 	if err != nil {
 		return user, err
 	}
@@ -47,5 +57,17 @@ func (db *UserQueries) DeleteUser(userId uuid.UUID) error {
 func (db *UserQueries) UpdateUserPassword(userId uuid.UUID, newPasswordHash string, newSalt string, updatedAt string) error {
 	query := `UPDATE users SET password_hash = $1, salt = $2, updated_at = $3 WHERE id = $4;`
 	_, err := db.Exec(query, newPasswordHash, newSalt, updatedAt, userId)
+	return err
+}
+
+func (db *UserQueries) UpdateUserDetails(userId uuid.UUID, email *string, name *string, profilePictureUrl *string, phoneNumber *string, updatedAt string) error {
+	query := `UPDATE users SET 
+		email = COALESCE($1, email),
+		name = COALESCE($2, name),
+		profile_picture_url = COALESCE($3, profile_picture_url),
+		phone_number = COALESCE($4, phone_number),
+		updated_at = $5
+		WHERE id = $6;`
+	_, err := db.Exec(query, email, name, profilePictureUrl, phoneNumber, updatedAt, userId)
 	return err
 }
