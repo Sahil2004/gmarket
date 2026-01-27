@@ -185,3 +185,57 @@ func ChangePassword(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusOK)
 }
+
+// UpdateCurrentUser godoc
+// @Summary Update current user information
+// @Description Update the information of the currently authenticated user
+func UpdateCurrentUser(c *fiber.Ctx) error {
+	userData := dtos.UpdateUserDTO{}
+	if err := c.BodyParser(&userData); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusBadRequest,
+			Message:    "Invalid request body",
+			DevMessage: err.Error(),
+		})
+	}
+
+	db, err := database.OpenDBConnection()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to connect to database",
+			DevMessage: err.Error(),
+		})
+	}
+
+	userID := c.UserContext().Value("user").(dtos.UserDTO).ID
+	updatedAt := time.Now().Format(time.RFC3339)
+
+	if err := db.UpdateUserDetails(userID, userData.Email, userData.Name, userData.ProfilePictureUrl, userData.PhoneNumber, updatedAt); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to update user details",
+			DevMessage: err.Error(),
+		})
+	}
+
+	user, err := db.GetUser(userID)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to retrieve updated user data",
+			DevMessage: err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(dtos.UserDTO{
+		ID:                user.ID,
+		Email:             user.Email,
+		Name:              user.Name,
+		ProfilePictureUrl: user.ProfilePictureUrl,
+		PhoneNumber:       user.PhoneNumber,
+		CreatedAt:         user.CreatedAt,
+		UpdatedAt:         user.UpdatedAt,
+	})
+}

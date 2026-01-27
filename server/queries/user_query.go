@@ -49,3 +49,15 @@ func (db *UserQueries) UpdateUserPassword(userId uuid.UUID, newPasswordHash stri
 	_, err := db.Exec(query, newPasswordHash, newSalt, updatedAt, userId)
 	return err
 }
+
+func (db *UserQueries) UpdateUserDetails(userId uuid.UUID, email *string, name *string, profilePictureUrl *string, phoneNumber *string, updatedAt string) error {
+	query := `UPDATE users SET 
+		email = COALESCE($1, email),
+		name = COALESCE($2, name),
+		profile_picture_url = COALESCE($3, profile_picture_url),
+		phone_number = COALESCE($4, phone_number),
+		updated_at = $5
+		WHERE id = $6;`
+	_, err := db.Exec(query, email, name, profilePictureUrl, phoneNumber, updatedAt, userId)
+	return err
+}
