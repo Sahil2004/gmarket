@@ -28,7 +28,7 @@
             matInput
             formControlName="name"
             placeholder="Update your name"
-            [value]="currentUser.name"
+            [value]="user().name"
           />
           <mat-error>
             {{ getErrorMessage('Name', name?.errors) }}
@@ -41,7 +41,7 @@
             matInput
             formControlName="email"
             placeholder="Update your email"
-            [value]="currentUser.email"
+            [value]="user().email"
           />
           <mat-error>
             {{ getErrorMessage('Email', email?.errors) }}
@@ -54,7 +54,7 @@
             matInput
             formControlName="phoneNumber"
             placeholder="Enter your phone number"
-            [value]="currentUser.phoneNumber"
+            [value]="user().phone_number"
           />
           <mat-error>
             {{ getErrorMessage('Phone Number', phoneNumber?.errors) }}
