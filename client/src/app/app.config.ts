@@ -16,14 +16,17 @@ import { DESIGN_SYSTEM } from '../config';
 import { IDesignSystem } from '../types/design-system.types';
 import { applyDesignSystem } from '../config/design-system.apply';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { apiConfigInterceptor } from '../interceptors';
+import { apiConfigInterceptor, errorHandlerInterceptor } from '../interceptors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withFetch(), withInterceptors([apiConfigInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([apiConfigInterceptor, errorHandlerInterceptor]),
+    ),
     {
       provide: TitleStrategy,
       useClass: AppTitleStrategy,
