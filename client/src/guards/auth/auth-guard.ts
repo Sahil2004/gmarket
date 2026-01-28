@@ -11,7 +11,7 @@ export const authGuard: CanActivateFn = async (route, state) => {
   const currentUrlInAuthRoutes = authRoutes.some((r) => route.url.toString().includes(r));
   if (currentUrlInAuthRoutes) {
     try {
-      const user = await firstValueFrom(userService.currentUser);
+      const user = await firstValueFrom(userService.isAuthenticated());
       router.navigate(['/']);
       return false;
     } catch (err) {
@@ -19,7 +19,7 @@ export const authGuard: CanActivateFn = async (route, state) => {
     }
   }
   try {
-    const user = await firstValueFrom(userService.currentUser);
+    const user = await firstValueFrom(userService.isAuthenticated());
     return true;
   } catch (err) {
     router.navigate(['/login']);

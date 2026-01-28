@@ -64,14 +64,6 @@ export class Login {
       next: () => {
         this.router.navigate(['/watchlist']);
       },
-      error: (err) => {
-        let snackBarRef = this._snackBar.open('Some network error occurred', 'Close', {
-          duration: 3000,
-        });
-        snackBarRef.onAction().subscribe(() => {
-          snackBarRef.dismiss();
-        });
-      },
     });
   }
 }

@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 
 import { IUserData, IUserUpdateData, IError } from '../types';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { SKIP_TOAST } from '../contexts';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,12 @@ export class UserService {
 
   get currentUser(): Observable<IUserData | IError> {
     return this.http.get<IUserData | IError>('/users');
+  }
+
+  isAuthenticated(): Observable<IUserData | IError> {
+    return this.http.get<IUserData | IError>('/users', {
+      context: new HttpContext().set(SKIP_TOAST, true),
+    });
   }
 
   login(email: string, password: string): Observable<IUserData | IError> {
