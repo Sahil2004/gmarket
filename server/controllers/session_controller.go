@@ -131,7 +131,7 @@ func CreateSession(c *fiber.Ctx) error {
 // @Description Delete the current session for the authenticated user
 // @Tags sessions
 // @Produce json
-// @Success 200
+// @Success 200 {object} dtos.SuccessDTO
 // @Failure 401 {object} dtos.ErrorDTO
 // @Router /sessions [delete]
 func DeleteCurrentSession(c *fiber.Ctx) error {
@@ -176,5 +176,8 @@ func DeleteCurrentSession(c *fiber.Ctx) error {
 	c.Cookie(expiredAccess)
 	c.Cookie(expiredRefresh)
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).JSON(dtos.SuccessDTO{
+		Code:    fiber.StatusOK,
+		Message: "Logged out successfully",
+	})
 }

@@ -90,7 +90,7 @@ func GetWatchlist(c *fiber.Ctx) error {
 // @Produce json
 // @Param watchlist_idx path int true "Watchlist Index (1-10)"
 // @Param symbol body dtos.SymbolDTO true "Symbol to add"
-// @Success 200
+// @Success 200 {object} dtos.SuccessDTO
 // @Failure 400 {object} dtos.ErrorDTO
 // @Failure 401 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
@@ -131,7 +131,10 @@ func AddSymbolToWatchlist(c *fiber.Ctx) error {
 
 	db.AddSymbolToWatchlist(user.ID.String(), idx, dbSymbol)
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).JSON(dtos.SuccessDTO{
+		Code:    fiber.StatusOK,
+		Message: "Symbol added successfully",
+	})
 }
 
 // RemoveSymbolFromWatchlist godoc
@@ -142,7 +145,7 @@ func AddSymbolToWatchlist(c *fiber.Ctx) error {
 // @Produce json
 // @Param watchlist_idx path int true "Watchlist Index (1-10)"
 // @Param symbol body dtos.SymbolDTO true "Symbol to remove"
-// @Success 200
+// @Success 200 {object} dtos.SuccessDTO
 // @Failure 400 {object} dtos.ErrorDTO
 // @Failure 401 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
@@ -183,5 +186,8 @@ func RemoveSymbolFromWatchlist(c *fiber.Ctx) error {
 
 	db.RemoveSymbolFromWatchlist(user.ID.String(), idx, dbSymbol)
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).JSON(dtos.SuccessDTO{
+		Code:    fiber.StatusOK,
+		Message: "Symbol removed successfully",
+	})
 }
