@@ -109,17 +109,22 @@ export class Profile {
 
   updateProfileHandler() {
     if (this.profileForm.valid) {
-      this.userService.updateProfile({
-        name: this.name?.value as string,
-        email: this.email?.value as string,
-        phone_number: this.phoneNumber?.value as number | undefined,
-      });
-      let snackBarRef = this._snackBar.open('Profile updated successfully', 'Close', {
-        duration: 3000,
-      });
-      snackBarRef.onAction().subscribe(() => {
-        snackBarRef.dismiss();
-      });
+      this.userService
+        .updateProfile({
+          name: this.name?.value as string,
+          email: this.email?.value as string,
+          phone_number: this.phoneNumber?.value as number | undefined,
+        })
+        .subscribe({
+          next: (res) => {
+            let snackBarRef = this._snackBar.open('Profile updated successfully', 'Close', {
+              duration: 3000,
+            });
+            snackBarRef.onAction().subscribe(() => {
+              snackBarRef.dismiss();
+            });
+          },
+        });
     }
   }
 
@@ -127,30 +132,27 @@ export class Profile {
     this._dialog.open(ChangePasswordDialog, {
       data: {
         onSubmit: (oldPassword: string, newPassword: string) => {
-          const success = this.userService.changePassword(oldPassword, newPassword);
-          if (success) {
-            let snackBarRef = this._snackBar.open('Password changed successfully', 'Close', {
-              duration: 3000,
-            });
-            snackBarRef.onAction().subscribe(() => {
-              snackBarRef.dismiss();
-            });
-          } else {
-            let snackBarRef = this._snackBar.open('Failed to change password', 'Close', {
-              duration: 3000,
-            });
-            snackBarRef.onAction().subscribe(() => {
-              snackBarRef.dismiss();
-            });
-          }
+          this.userService.changePassword(oldPassword, newPassword).subscribe({
+            next: (res) => {
+              let snackBarRef = this._snackBar.open('Password changed successfully', 'Close', {
+                duration: 3000,
+              });
+              snackBarRef.onAction().subscribe(() => {
+                snackBarRef.dismiss();
+              });
+            },
+          });
         },
       },
     });
   }
 
   logoutHandler() {
-    this.userService.logout();
-    this.router.navigate(['/login']);
+    this.userService.logout().subscribe({
+      next: (res) => {
+        this.router.navigate(['/login']);
+      },
+    });
   }
 
   deleteAccountHandler() {
@@ -161,8 +163,11 @@ export class Profile {
         confirmText: 'Delete',
         cancelText: 'Cancel',
         onConfirm: () => {
-          this.userService.deleteAccount();
-          this.router.navigate(['/login']);
+          this.userService.deleteAccount().subscribe({
+            next: (res) => {
+              this.router.navigate(['/login']);
+            },
+          });
         },
       },
     });
