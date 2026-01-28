@@ -22,10 +22,9 @@ func main() {
 	app.Mount("/api", api)
 
 	api.Use(cors.New(cors.Config{
-		// Credentials require a specific origin, NOT "*"
-		AllowOrigins:     "http://localhost:3000, http://localhost:8080",
+		AllowOrigins:     "http://localhost:3000, http://localhost:4200",
 		AllowCredentials: true,
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, Set-Cookie",
+		AllowHeaders:     "Origin, Content-Type, Accept, Set-Cookie",
 	}))
 
 	routes.SwaggerRoute(api)

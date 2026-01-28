@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../services/user.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'login',
@@ -55,20 +56,14 @@ export class Login {
     }
     return '';
   }
-  loginHandler() {
+  async loginHandler() {
     let email = this.email?.value;
     let password = this.password?.value;
     if (!email || !password) return;
-    const res = this.userService.login(email, password);
-    if (res) {
-      this.router.navigate(['/watchlist']);
-    } else {
-      let snackBarRef = this._snackBar.open('Invalid email or password', 'Close', {
-        duration: 3000,
-      });
-      snackBarRef.onAction().subscribe(() => {
-        snackBarRef.dismiss();
-      });
-    }
+    this.userService.login(email, password).subscribe({
+      next: () => {
+        this.router.navigate(['/watchlist']);
+      },
+    });
   }
 }

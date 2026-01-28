@@ -15,14 +15,18 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { DESIGN_SYSTEM } from '../config';
 import { IDesignSystem } from '../types/design-system.types';
 import { applyDesignSystem } from '../config/design-system.apply';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { apiConfigInterceptor, errorHandlerInterceptor } from '../interceptors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withFetch()),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([apiConfigInterceptor, errorHandlerInterceptor]),
+    ),
     {
       provide: TitleStrategy,
       useClass: AppTitleStrategy,

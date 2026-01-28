@@ -1,81 +1,60 @@
 import { inject, Injectable } from '@angular/core';
 
-import { IUserDataClient } from '../types/user-data.types';
-import { UserDataStore } from '../stores/userData.store';
+import { IUserData, IUserUpdateData, IError } from '../types';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { SKIP_TOAST } from '../contexts';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  private user: IUserDataClient | null = null;
-  private ds = inject(UserDataStore);
+  private http = inject(HttpClient);
 
-  get currentUser(): IUserDataClient | null {
-    return this.user;
+  get currentUser(): Observable<IUserData | IError> {
+    return this.http.get<IUserData | IError>('/users');
   }
 
-  login(email: string, password: string): boolean {
-    const res = this.ds.findUserByEmail(email);
-    if (res && res.password === password) {
-      this.user = res;
-      return true;
-    }
-    return false;
+  isAuthenticated(): Observable<IUserData | IError> {
+    return this.http.get<IUserData | IError>('/users', {
+      context: new HttpContext().set(SKIP_TOAST, true),
+    });
   }
 
-  register(name: string, email: string, password: string): boolean {
-    const existingUser = this.ds.findUserByEmail(email);
-    if (existingUser) {
-      return false;
-    }
-    this.user = this.ds.setUser({ name, email, password });
-    return true;
+  login(email: string, password: string): Observable<IUserData | IError> {
+    const loginDetails = {
+      email,
+      password,
+    };
+    return this.http.post<IUserData | IError>('/sessions', loginDetails);
   }
 
-  logout(): boolean {
-    this.user = null;
-    return true;
+  register(name: string, email: string, password: string): Observable<IUserData | IError> {
+    const registerDetails = {
+      email,
+      name,
+      password,
+    };
+    return this.http.post<IUserData | IError>('/users', registerDetails);
   }
 
-  updateProfile(updatedData: Partial<IUserDataClient>): boolean {
-    if (!this.user) return false;
-    this.user = this.ds.updateUser(this.user.id, updatedData);
-    return true;
+  logout(): Observable<null | IError> {
+    return this.http.delete<null | IError>('/sessions');
   }
 
-  changePassword(oldPassword: string, newPassword: string): boolean {
-    if (!this.user) return false;
-    let res = this.ds.updatePassword(this.user.id, oldPassword, newPassword);
-    if (res) {
-      this.user = res;
-      return true;
-    }
-    return false;
+  updateProfile(updatedData: Partial<IUserUpdateData>): Observable<IUserData | IError> {
+    return this.http.patch<IUserData | IError>('/users', updatedData);
   }
 
-  deleteAccount(): boolean {
-    if (!this.user) return false;
-    const deletedUser = this.ds.deleteUser(this.user.id);
-    if (deletedUser) {
-      this.user = null;
-      return true;
-    }
-    return false;
+  changePassword(oldPassword: string, newPassword: string): Observable<null | IError> {
+    const changePasswordDetails = {
+      old_password: oldPassword,
+      new_password: newPassword,
+    };
+    return this.http.post<null | IError>('/users/change-password', changePasswordDetails);
   }
 
-  isAuthenticated(): boolean {
-    return this.user !== null;
-  }
-
-  addStockToWatchlist(watchlistIndex: number, stockSymbol: string): boolean {
-    if (!this.user) return false;
-    if (watchlistIndex < 0) return false;
-    return this.ds.addStockToWatchlist(this.user.id, watchlistIndex, stockSymbol);
-  }
-
-  removeStockFromWatchlist(watchlistIndex: number, stockSymbol: string): boolean {
-    if (!this.user) return false;
-    if (watchlistIndex < 0) return false;
-    return this.ds.removeStockFromWatchlist(this.user.id, watchlistIndex, stockSymbol);
+  deleteAccount(): Observable<null | IError> {
+    return this.http.delete<null | IError>('/users');
   }
 }
