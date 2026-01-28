@@ -8,8 +8,7 @@ export function apiConfigInterceptor(
 ): Observable<HttpEvent<unknown>> {
   const apiReq = req.clone({
     withCredentials: true,
-    credentials: 'include',
-    url: `${environment.API_BASE_URI}/${req.url}`,
+    url: `${environment.API_BASE_URI}${req.url}`,
   });
 
   return next(apiReq);
