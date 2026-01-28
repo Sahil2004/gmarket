@@ -161,7 +161,10 @@ const docTemplate = `{
                 "summary": "Delete the current session (logout)",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SuccessDTO"
+                        }
                     },
                     "401": {
                         "description": "Unauthorized",
@@ -246,7 +249,10 @@ const docTemplate = `{
                 "summary": "Delete current user",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SuccessDTO"
+                        }
                     },
                     "401": {
                         "description": "Unauthorized",
@@ -333,7 +339,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SuccessDTO"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -436,7 +445,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SuccessDTO"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -490,7 +502,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SuccessDTO"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -563,6 +578,19 @@ const docTemplate = `{
             "properties": {
                 "user": {
                     "$ref": "#/definitions/dtos.UserDTO"
+                }
+            }
+        },
+        "dtos.SuccessDTO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 200
+                },
+                "message": {
+                    "type": "string",
+                    "example": "OK"
                 }
             }
         },

@@ -78,7 +78,7 @@ func GetCurrentUser(c *fiber.Ctx) error {
 // @Description Delete the currently authenticated user
 // @Tags users
 // @Produce json
-// @Success 200
+// @Success 200 {object} dtos.SuccessDTO
 // @Failure 401 {object} dtos.ErrorDTO
 // @Router /users [delete]
 func DeleteCurrentUser(c *fiber.Ctx) error {
@@ -120,7 +120,10 @@ func DeleteCurrentUser(c *fiber.Ctx) error {
 	c.Cookie(expiredAccess)
 	c.Cookie(expiredRefresh)
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).JSON(dtos.SuccessDTO{
+		Code:    fiber.StatusOK,
+		Message: "User deleted successfully",
+	})
 }
 
 // ChangePassword godoc
@@ -130,7 +133,7 @@ func DeleteCurrentUser(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param password body dtos.ChangePasswordDTO true "Change Password Data"
-// @Success 200
+// @Success 200 {object} dtos.SuccessDTO
 // @Failure 400 {object} dtos.ErrorDTO
 // @Failure 401 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
@@ -185,7 +188,10 @@ func ChangePassword(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).JSON(dtos.SuccessDTO{
+		Code:    fiber.StatusOK,
+		Message: "Password changed successfully",
+	})
 }
 
 // UpdateCurrentUser godoc
