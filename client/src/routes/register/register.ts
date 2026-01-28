@@ -49,7 +49,7 @@ export class Register {
     },
     {
       validators: matchFieldValidator('confirmPassword', 'password'),
-    }
+    },
   );
   get registerFormRef() {
     return this.registerForm;
@@ -93,16 +93,10 @@ export class Register {
     let password = this.password?.value;
     let confirmPassword = this.confirmPassword?.value;
     if (!name || !email || !password || !confirmPassword) return;
-    const res = this.userService.register(name, email, password);
-    if (res) {
-      this.router.navigate(['/watchlist']);
-    } else {
-      let snackBarRef = this._snackBar.open('Unable to register. Please try again.', 'Close', {
-        duration: 3000,
-      });
-      snackBarRef.onAction().subscribe(() => {
-        snackBarRef.dismiss();
-      });
-    }
+    this.userService.register(name, email, password).subscribe({
+      next: (res) => {
+        this.router.navigate(['/watchlist']);
+      },
+    });
   }
 }
