@@ -11,14 +11,14 @@ export class StocksService {
   private stocks$!: Observable<IStock[]>;
 
   getAllStocks(): Observable<IStock[]> {
-    this.stocks$ = this.http.get<IStock[]>('/data/stocks.json').pipe(shareReplay(1));
+    this.stocks$ = this.http.get<IStock[]>('/market/symbols').pipe(shareReplay(1));
     return this.stocks$;
   }
 
   isAStockSymbol(symbol: string): Observable<boolean> {
     return this.getAllStocks().pipe(
       shareReplay(1),
-      map((stocks) => stocks.some((stock) => stock.symbol === symbol))
+      map((stocks) => stocks.some((stock) => stock.symbol === symbol)),
     );
   }
 
