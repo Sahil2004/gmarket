@@ -18,6 +18,7 @@ export class InputImage {
   _dialog = inject(MatDialog);
 
   openImageUploadDialog() {
+    console.log(this.imageUri);
     this._dialog.open(ImageUploadDialog, {
       data: {
         title: this.title,

@@ -1,7 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/Sahil2004/gmarket/server/routes"
+	"github.com/Sahil2004/gmarket/server/services"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -27,9 +30,14 @@ func main() {
 		AllowHeaders:     "Origin, Content-Type, Accept, Set-Cookie",
 	}))
 
+	imageService, err := services.NewImageService()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	routes.SwaggerRoute(api)
 	routes.SessionRoute(api)
-	routes.UserRoute(api)
+	routes.UserRoute(api, imageService)
 	routes.MarketRoute(api)
 	routes.WatchlistRoute(api)
 

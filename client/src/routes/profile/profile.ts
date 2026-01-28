@@ -34,7 +34,15 @@ export class Profile {
   private route = inject(ActivatedRoute);
   private data = toSignal(this.route.data);
 
-  user = computed(() => this.data()?.['userData'] as IUserData);
+  private userUpdate = signal<IUserData | null>(null);
+  user = computed(() => {
+    if (this.userUpdate() !== null) {
+      return this.userUpdate() as IUserData;
+    } else {
+      console.log(this.data()?.['userData']);
+      return this.data()?.['userData'] as IUserData;
+    }
+  });
 
   profilePhotoUri = signal<string | null>(this.user().profile_picture_url || null);
 
@@ -83,23 +91,18 @@ export class Profile {
 
   updateProfilePhoto() {
     return (newImage: string) => {
-      const profile = this.userService.updateProfile({ profile_picture_url: newImage });
-      if (!profile) {
-        let snackBarRef = this._snackBar.open('Failed to update profile photo', 'Close', {
-          duration: 3000,
-        });
-        snackBarRef.onAction().subscribe(() => {
-          snackBarRef.dismiss();
-        });
-        return false;
-      }
-      let snackBarRef = this._snackBar.open('Profile photo updated successfully', 'Close', {
-        duration: 3000,
+      this.userService.updateProfile({ profile_picture_url: newImage }).subscribe({
+        next: (res) => {
+          let snackBarRef = this._snackBar.open('Profile photo updated successfully', 'Close', {
+            duration: 3000,
+          });
+          snackBarRef.onAction().subscribe(() => {
+            snackBarRef.dismiss();
+          });
+          this.userUpdate.set(res as IUserData);
+          this.profilePhotoUri.set(this.user().profile_picture_url || null);
+        },
       });
-      snackBarRef.onAction().subscribe(() => {
-        snackBarRef.dismiss();
-      });
-      this.profilePhotoUri.set(this.user().profile_picture_url || null);
       return true;
     };
   }

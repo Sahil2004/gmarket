@@ -6,6 +6,7 @@ import (
 	"github.com/Sahil2004/gmarket/server/database"
 	"github.com/Sahil2004/gmarket/server/dtos"
 	"github.com/Sahil2004/gmarket/server/models"
+	"github.com/Sahil2004/gmarket/server/services"
 	"github.com/Sahil2004/gmarket/server/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -199,76 +200,90 @@ func ChangePassword(c *fiber.Ctx) error {
 // @Failure 401 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
 // @Router /users [patch]
-func UpdateCurrentUser(c *fiber.Ctx) error {
-	userData := dtos.UpdateUserDTO{}
-	if err := c.BodyParser(&userData); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusBadRequest,
-			Message:    "Invalid request body",
-			DevMessage: err.Error(),
-		})
+func UpdateCurrentUser(imageService *services.ImageService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userData := dtos.UpdateUserDTO{}
+		if err := c.BodyParser(&userData); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+				Code:       fiber.StatusBadRequest,
+				Message:    "Invalid request body",
+				DevMessage: err.Error(),
+			})
+		}
+
+		db, err := database.OpenDBConnection()
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+				Code:       fiber.StatusInternalServerError,
+				Message:    "Failed to connect to database",
+				DevMessage: err.Error(),
+			})
+		}
+
+		userID := c.UserContext().Value("user").(dtos.UserDTO).ID
+		updatedAt := time.Now().Format(time.RFC3339)
+
+		if userData.ProfilePictureUrl != nil {
+			uploadResult, err := imageService.UploadFromDataURL(*userData.ProfilePictureUrl, userID.String())
+			if err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+					Code:       fiber.StatusInternalServerError,
+					Message:    "Failed to upload profile picture",
+					DevMessage: err.Error(),
+				})
+			}
+			userData.ProfilePictureUrl = &uploadResult.SecureURL
+		}
+
+		if err := db.UpdateUserDetails(userID, userData.Email, userData.Name, userData.ProfilePictureUrl, userData.PhoneNumber, updatedAt); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+				Code:       fiber.StatusInternalServerError,
+				Message:    "Failed to update user details",
+				DevMessage: err.Error(),
+			})
+		}
+
+		user, err := db.GetUser(userID)
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+				Code:       fiber.StatusInternalServerError,
+				Message:    "Failed to retrieve updated user data",
+				DevMessage: err.Error(),
+			})
+		}
+
+		newUser := dtos.UserDTO{
+			ID:                user.ID,
+			Email:             user.Email,
+			Name:              user.Name,
+			ProfilePictureUrl: user.ProfilePictureUrl,
+			PhoneNumber:       user.PhoneNumber,
+			CreatedAt:         user.CreatedAt,
+			UpdatedAt:         user.UpdatedAt,
+		}
+
+		newAccessToken, err := utils.GenerateAccessToken(newUser)
+
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+				Code:       fiber.StatusInternalServerError,
+				Message:    "Failed to generate access token",
+				DevMessage: err.Error(),
+			})
+		}
+
+		accessCookie := new(fiber.Cookie)
+		accessCookie.Name = "access_token"
+		accessCookie.Value = newAccessToken
+		accessCookie.Expires = time.Now().Add(15 * time.Minute)
+		accessCookie.HTTPOnly = true
+		accessCookie.Path = "/"
+		accessCookie.SameSite = "Lax"
+		accessCookie.Secure = false // ! Set to true in production with HTTPS
+
+		c.Cookie(accessCookie)
+
+		return c.Status(fiber.StatusOK).JSON(newUser)
 	}
-
-	db, err := database.OpenDBConnection()
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Failed to connect to database",
-			DevMessage: err.Error(),
-		})
-	}
-
-	userID := c.UserContext().Value("user").(dtos.UserDTO).ID
-	updatedAt := time.Now().Format(time.RFC3339)
-
-	if err := db.UpdateUserDetails(userID, userData.Email, userData.Name, userData.ProfilePictureUrl, userData.PhoneNumber, updatedAt); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Failed to update user details",
-			DevMessage: err.Error(),
-		})
-	}
-
-	user, err := db.GetUser(userID)
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Failed to retrieve updated user data",
-			DevMessage: err.Error(),
-		})
-	}
-
-	newUser := dtos.UserDTO{
-		ID:                user.ID,
-		Email:             user.Email,
-		Name:              user.Name,
-		ProfilePictureUrl: user.ProfilePictureUrl,
-		PhoneNumber:       user.PhoneNumber,
-		CreatedAt:         user.CreatedAt,
-		UpdatedAt:         user.UpdatedAt,
-	}
-
-	newAccessToken, err := utils.GenerateAccessToken(newUser)
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Failed to generate access token",
-			DevMessage: err.Error(),
-		})
-	}
-
-	accessCookie := new(fiber.Cookie)
-	accessCookie.Name = "access_token"
-	accessCookie.Value = newAccessToken
-	accessCookie.Expires = time.Now().Add(15 * time.Minute)
-	accessCookie.HTTPOnly = true
-	accessCookie.Path = "/"
-	accessCookie.SameSite = "Lax"
-	accessCookie.Secure = false // ! Set to true in production with HTTPS
-
-	c.Cookie(accessCookie)
-
-	return c.Status(fiber.StatusOK).JSON(newUser)
 }

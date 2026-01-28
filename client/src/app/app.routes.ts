@@ -29,6 +29,7 @@ export const routes: Routes = [
         resolve: {
           userData: userResolver,
         },
+        runGuardsAndResolvers: 'always',
       },
     ],
   },
