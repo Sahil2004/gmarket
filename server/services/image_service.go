@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Sahil2004/gmarket/server/config"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
@@ -16,7 +17,7 @@ type ImageService struct {
 }
 
 func NewImageService() (*ImageService, error) {
-	cld, err := cloudinary.New()
+	cld, err := cloudinary.NewFromParams(config.AppConfig().CloudinaryCloudName, config.AppConfig().CloudinaryApiKey, config.AppConfig().CloudinaryApiSecret)
 	if err != nil {
 		return nil, fmt.Errorf("cloudinary init failed: %w", err)
 	}
