@@ -3,6 +3,14 @@
     <mat-list-item [activated]="activated(stock.symbol)">
       <span class="flex justify-between items-center group">
         <a [routerLink]="['/watchlist/' + stock.symbol]">{{ stock.symbol }}</a>
+        <span class="flex justify-between items-center gap-2 group-hover:hidden">
+          <p>
+            {{ (stock.ltp - stock.last_close_price).toFixed(2) }}
+          </p>
+          <p>
+            {{ stock.ltp.toFixed(2) }}
+          </p>
+        </span>
         <span class="hidden justify-between items-center gap-2 group-hover:flex">
           @if (displayActions) {
             <button matButton="filled" (click)="buyHandler(stock.symbol)">B</button>

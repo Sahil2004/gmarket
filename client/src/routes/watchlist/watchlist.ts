@@ -24,22 +24,16 @@ export class Watchlist {
   private _snackBar = inject(MatSnackBar);
 
   currentWatchlistIdx = signal<number>(0);
-  watchlists = computed(async () => {
+  watchlistUpdatedAt = signal<Date | null>(null);
+  watchlist = computed(async () => {
+    const update = this.watchlistUpdatedAt();
     try {
       const watchlist = (await firstValueFrom(
         this.watchlistService.getWatchlist(this.currentWatchlistIdx() + 1),
       )) as IWatchlist;
-      let watchlists: IWatchlistSymbol[][] = [];
-      for (let i = 0; i < 10; i++) {
-        if (i != this.currentWatchlistIdx()) {
-          watchlists.push([]);
-        } else {
-          watchlists.push(watchlist.symbols);
-        }
-      }
-      return watchlists;
+      return watchlist;
     } catch (err) {
-      return new Array(10).fill([]) as IWatchlistSymbol[][];
+      return { index: this.currentWatchlistIdx() + 1, symbols: [] } as IWatchlist;
     }
   });
 
@@ -48,7 +42,7 @@ export class Watchlist {
   }
 
   updateWatchlists() {
-    // this.watchlists.set(this.currentUser?.watchlists ?? []);
+    this.watchlistUpdatedAt.set(new Date());
   }
 
   addStockToWatchlist() {
@@ -86,18 +80,13 @@ export class Watchlist {
 
   removeFromWatchlistHandler() {
     return (symbol: string, exchange: string) => {
-      // const res = this.userService.removeStockFromWatchlist(this.currentWatchlistIdx(), stock);
-      // if (!res) {
-      //   let snackBarRef = this._snackBar.open('Failed to remove stock from watchlist', 'Close', {
-      //     duration: 3000,
-      //   });
-      //   snackBarRef.onAction().subscribe(() => {
-      //     snackBarRef.dismiss();
-      //   });
-      //   return false;
-      // }
-      // this.updateWatchlists();
-      // return true;
+      this.watchlistService
+        .removeStockFromWatchlist(this.currentWatchlistIdx() + 1, symbol, exchange)
+        .subscribe({
+          next: (res) => {
+            this.updateWatchlists();
+          },
+        });
     };
   }
 

@@ -9,14 +9,12 @@
       symbol="add"
       [searchHandler]="addStockToWatchlist()"
     ></search>
-    @if (watchlists() | async; as watchlistValues) {
-      <watchlist-tabs
-        [watchlists]="watchlistValues"
-        [tabChangeHandler]="watchlistChangeHandler()"
-        [buyHandler]="buyHandler()"
-        [sellHandler]="sellHandler()"
-        [removeFromWatchlistHandler]="removeFromWatchlistHandler()"
-      ></watchlist-tabs>
-    }
+    <watchlist-tabs
+      [watchlist]="watchlist()"
+      [tabChangeHandler]="watchlistChangeHandler()"
+      [buyHandler]="buyHandler()"
+      [sellHandler]="sellHandler()"
+      [removeFromWatchlistHandler]="removeFromWatchlistHandler()"
+    ></watchlist-tabs>
   </mat-drawer>
 </mat-drawer-container>
