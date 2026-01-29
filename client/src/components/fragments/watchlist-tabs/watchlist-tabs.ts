@@ -1,6 +1,7 @@
 import { Component, Input, output } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { StocksList } from '../stocks-list/stocks-list';
+import { IWatchlistSymbol } from '../../../types';
 
 @Component({
   selector: 'watchlist-tabs',
@@ -9,8 +10,8 @@ import { StocksList } from '../stocks-list/stocks-list';
 })
 export class WatchlistTabs {
   @Input() tabChangeHandler: (event: { index: number }) => void = (event) => {};
-  @Input({ required: true }) watchlists!: string[][];
+  @Input({ required: true }) watchlists!: IWatchlistSymbol[][];
   @Input() buyHandler: (stock: string) => void = () => {};
   @Input() sellHandler: (stock: string) => void = () => {};
-  @Input() removeFromWatchlistHandler: (stock: string) => void = () => {};
+  @Input() removeFromWatchlistHandler: (symbol: string, exchange: string) => void = () => {};
 }

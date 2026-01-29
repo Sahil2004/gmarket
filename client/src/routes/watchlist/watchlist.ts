@@ -1,32 +1,45 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Search, WatchlistTabs } from '../../components';
 import { StocksService, WatchlistService } from '../../services';
 import { IStock } from '../../types/stocks.types';
-import type { Observable } from 'rxjs';
+import { firstValueFrom, type Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IWatchlist, IWatchlistSymbol } from '../../types';
 
 @Component({
   selector: 'watchlist',
   templateUrl: 'watchlist.html',
   imports: [RouterOutlet, MatSidenavModule, Search, WatchlistTabs, AsyncPipe],
 })
-export class Watchlist implements OnInit {
+export class Watchlist {
+  private route = inject(ActivatedRoute);
+  private data = toSignal(this.route.data);
+  stockList = computed(() => this.data()?.['stockData'] as IStock[]);
   private stockService = inject(StocksService);
   private watchlistService = inject(WatchlistService);
   private _snackBar = inject(MatSnackBar);
 
   currentWatchlistIdx = signal<number>(0);
-  // watchlists = signal<string[][]>(this.currentUser?.watchlists ?? []);
-  watchlists = signal<string[][]>([]);
-
-  stockList$!: Observable<IStock[] | undefined>;
-
-  ngOnInit(): void {
-    this.stockList$ = this.stockService.getAllStocks();
-  }
+  watchlists = computed(async () => {
+    const watchlist = (await firstValueFrom(
+      this.watchlistService.getWatchlist(this.currentWatchlistIdx() + 1),
+    )) ?? { index: this.currentWatchlistIdx() + 1, symbols: [] };
+    console.log(watchlist);
+    let watchlists: IWatchlistSymbol[][] = [];
+    for (let i = 0; i < 10; i++) {
+      if (i != this.currentWatchlistIdx()) {
+        watchlists.push([]);
+      } else {
+        watchlists.push([]);
+        // watchlists.push(watchlist.symbols);
+      }
+    }
+    return watchlists;
+  });
 
   getStockSymbols(stocks: IStock[]): string[] {
     return stocks.map((stock) => stock.symbol);
@@ -37,30 +50,22 @@ export class Watchlist implements OnInit {
   }
 
   addStockToWatchlist() {
-    return (query: string) => {
-      return this.stockService.isAStockSymbol(query).subscribe((decision) => {
-        // if (decision) {
-        //   const res = this.userService.addStockToWatchlist(this.currentWatchlistIdx(), query);
-        //   if (!res) {
-        //     let snackBarRef = this._snackBar.open('Failed to add stock to watchlist', 'Close', {
-        //       duration: 3000,
-        //     });
-        //     snackBarRef.onAction().subscribe(() => {
-        //       snackBarRef.dismiss();
-        //     });
-        //     return false;
-        //   }
-        //   this.updateWatchlists();
-        //   return true;
-        // } else {
-        //   let snackBarRef = this._snackBar.open('Stock symbol not found', 'Close', {
-        //     duration: 3000,
-        //   });
-        //   snackBarRef.onAction().subscribe(() => {
-        //     snackBarRef.dismiss();
-        //   });
-        //   return false;
-        // }
+    return (symbol: string, exchange: string) => {
+      return this.stockService.isAStockSymbol(symbol).subscribe((decision) => {
+        if (decision) {
+          this.watchlistService
+            .addStockToWatchlist(this.currentWatchlistIdx(), symbol, exchange)
+            .subscribe((res) => {
+              this.updateWatchlists();
+            });
+        } else {
+          let snackBarRef = this._snackBar.open('Invalid stock symbol', 'Close', {
+            duration: 3000,
+          });
+          snackBarRef.onAction().subscribe(() => {
+            snackBarRef.dismiss();
+          });
+        }
       });
     };
   }
@@ -78,7 +83,7 @@ export class Watchlist implements OnInit {
   }
 
   removeFromWatchlistHandler() {
-    return (stock: string) => {
+    return (symbol: string, exchange: string) => {
       // const res = this.userService.removeStockFromWatchlist(this.currentWatchlistIdx(), stock);
       // if (!res) {
       //   let snackBarRef = this._snackBar.open('Failed to remove stock from watchlist', 'Close', {
