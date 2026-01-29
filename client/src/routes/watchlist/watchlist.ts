@@ -4,16 +4,15 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { Search, WatchlistTabs } from '../../components';
 import { StocksService, WatchlistService } from '../../services';
 import { IStock } from '../../types/stocks.types';
-import { firstValueFrom, type Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IWatchlist, IWatchlistSymbol } from '../../types';
+import { IWatchlist } from '../../types';
 
 @Component({
   selector: 'watchlist',
   templateUrl: 'watchlist.html',
-  imports: [RouterOutlet, MatSidenavModule, Search, WatchlistTabs, AsyncPipe],
+  imports: [RouterOutlet, MatSidenavModule, Search, WatchlistTabs],
 })
 export class Watchlist {
   private route = inject(ActivatedRoute);
