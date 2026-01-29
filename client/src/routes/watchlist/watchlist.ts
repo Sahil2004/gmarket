@@ -25,20 +25,22 @@ export class Watchlist {
 
   currentWatchlistIdx = signal<number>(0);
   watchlists = computed(async () => {
-    const watchlist = (await firstValueFrom(
-      this.watchlistService.getWatchlist(this.currentWatchlistIdx() + 1),
-    )) ?? { index: this.currentWatchlistIdx() + 1, symbols: [] };
-    console.log(watchlist);
-    let watchlists: IWatchlistSymbol[][] = [];
-    for (let i = 0; i < 10; i++) {
-      if (i != this.currentWatchlistIdx()) {
-        watchlists.push([]);
-      } else {
-        watchlists.push([]);
-        // watchlists.push(watchlist.symbols);
+    try {
+      const watchlist = (await firstValueFrom(
+        this.watchlistService.getWatchlist(this.currentWatchlistIdx() + 1),
+      )) as IWatchlist;
+      let watchlists: IWatchlistSymbol[][] = [];
+      for (let i = 0; i < 10; i++) {
+        if (i != this.currentWatchlistIdx()) {
+          watchlists.push([]);
+        } else {
+          watchlists.push(watchlist.symbols);
+        }
       }
+      return watchlists;
+    } catch (err) {
+      return new Array(10).fill([]) as IWatchlistSymbol[][];
     }
-    return watchlists;
   });
 
   getStockSymbols(stocks: IStock[]): string[] {
@@ -54,7 +56,7 @@ export class Watchlist {
       return this.stockService.isAStockSymbol(symbol).subscribe((decision) => {
         if (decision) {
           this.watchlistService
-            .addStockToWatchlist(this.currentWatchlistIdx(), symbol, exchange)
+            .addStockToWatchlist(this.currentWatchlistIdx() + 1, symbol, exchange)
             .subscribe((res) => {
               this.updateWatchlists();
             });
