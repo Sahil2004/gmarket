@@ -8,6 +8,7 @@ export const chartResolver: ResolveFn<IChartApiResponse> = (
   state: RouterStateSnapshot,
 ) => {
   let stockSymbol = route.paramMap.get('symbol')!;
+  let exchange = route.paramMap.get('exchange')!;
   let stockService = inject(StocksService);
-  return stockService.getChartData(`${stockSymbol}.NS`, '1m', '1d');
+  return stockService.getChartData(stockSymbol, exchange, '1d', '5d');
 };

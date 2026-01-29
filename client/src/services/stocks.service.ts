@@ -22,9 +22,19 @@ export class StocksService {
     );
   }
 
-  getChartData(symbol: string, interval: string, range: string): Observable<IChartApiResponse> {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=${range}&interval=${interval}`;
-    const proxiedUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-    return this.http.get<IChartApiResponse>(proxiedUrl);
+  getChartData(
+    symbol: string,
+    exchange: string,
+    interval: string,
+    range: string,
+  ): Observable<IChartApiResponse> {
+    return this.http.get<IChartApiResponse>('/market/chart', {
+      params: {
+        exchange,
+        symbol,
+        range,
+        interval,
+      },
+    });
   }
 }
