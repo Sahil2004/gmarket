@@ -4,7 +4,7 @@
       <span class="flex justify-between items-center group">
         <a [routerLink]="['/watchlist/' + stock.symbol]">{{ stock.symbol }}</a>
         <span class="flex justify-between items-center gap-2 group-hover:hidden">
-          <p>
+          <p class="text-gray-200">
             {{ (stock.ltp - stock.last_close_price).toFixed(2) }}
           </p>
           <p>
