@@ -11,13 +11,20 @@
       [matAutocomplete]="auto"
     />
     @if (search.value) {
-    <button matSuffix matIconButton [aria-label]="symbol" (click)="searchHandler(search.value)">
-      <mat-icon>{{ symbol }}</mat-icon>
-    </button>
+      <button
+        matSuffix
+        matIconButton
+        [aria-label]="symbol"
+        (click)="
+          searchHandler(symbolDeserializer(search.value)[0], symbolDeserializer(search.value)[1])
+        "
+      >
+        <mat-icon>{{ symbol }}</mat-icon>
+      </button>
     }
     <mat-autocomplete #auto="matAutocomplete">
       @for (option of filteredOptions | async; track option) {
-      <mat-option [value]="option">{{ option }}</mat-option>
+        <mat-option [value]="`${option.symbol}:${option.exchange}`">{{ option.symbol }}</mat-option>
       }
     </mat-autocomplete>
   </mat-form-field>

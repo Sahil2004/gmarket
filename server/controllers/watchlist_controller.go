@@ -66,11 +66,35 @@ func GetWatchlist(c *fiber.Ctx) error {
 				DevMessage: err.Error(),
 			})
 		}
+
+		chart, ok := exchangeData["chart"].(map[string]interface{})
+		if !ok || chart == nil {
+			continue
+		}
+
+		results, ok := chart["result"].([]interface{})
+		if !ok || len(results) == 0 || results[0] == nil {
+			continue
+		}
+
+		result0, ok := results[0].(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		meta, ok := result0["meta"].(map[string]interface{})
+		if !ok || meta == nil {
+			continue
+		}
+
+		ltp, _ := meta["regularMarketPrice"].(float64)
+		lastClose, _ := meta["chartPreviousClose"].(float64)
+
 		symbolInfos = append(symbolInfos, dtos.SymbolInfo{
 			Symbol:         actualSymbol,
 			Exchange:       exchange,
-			LTP:            exchangeData["chart"].(map[string]interface{})["result"].([]interface{})[0].(map[string]interface{})["meta"].(map[string]interface{})["regularMarketPrice"].(float64),
-			LastClosePrice: exchangeData["chart"].(map[string]interface{})["result"].([]interface{})[0].(map[string]interface{})["meta"].(map[string]interface{})["chartPreviousClose"].(float64),
+			LTP:            ltp,
+			LastClosePrice: lastClose,
 		})
 	}
 

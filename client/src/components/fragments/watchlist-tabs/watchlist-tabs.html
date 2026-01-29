@@ -3,14 +3,18 @@
   class="h-full max-h-[75svh] w-full"
   (selectedTabChange)="tabChangeHandler($event)"
 >
-  @for (watchlist of watchlists; track watchlist; let idx = $index) {
-  <mat-tab [label]="(idx + 1).toString()">
-    <stocks-list
-      [stocks]="watchlist"
-      [buyHandler]="buyHandler"
-      [sellHandler]="sellHandler"
-      [removeFromWatchlistHandler]="removeFromWatchlistHandler"
-    ></stocks-list>
-  </mat-tab>
+  @for (number of numbers; track number; let idx = $index) {
+    <mat-tab [label]="(idx + 1).toString()">
+      @if (watchlist | async; as list) {
+        @if (list.index == idx + 1) {
+          <stocks-list
+            [stocks]="list.symbols"
+            [buyHandler]="buyHandler"
+            [sellHandler]="sellHandler"
+            [removeFromWatchlistHandler]="removeFromWatchlistHandler"
+          ></stocks-list>
+        }
+      }
+    </mat-tab>
   }
 </mat-tab-group>

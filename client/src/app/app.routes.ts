@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../guards';
-import { stockResolver, userResolver } from '../resolvers';
+import { chartResolver, stockResolver, userResolver } from '../resolvers';
 
 export const routes: Routes = [
   {
@@ -12,12 +12,15 @@ export const routes: Routes = [
       {
         path: 'watchlist',
         loadComponent: () => import('../routes').then((m) => m.Watchlist),
+        resolve: {
+          stockData: stockResolver,
+        },
         children: [
           {
             path: ':symbol',
             loadComponent: () => import('../routes').then((m) => m.StockChart),
             resolve: {
-              stockData: stockResolver,
+              chartData: chartResolver,
             },
             runGuardsAndResolvers: 'paramsOrQueryParamsChange',
           },

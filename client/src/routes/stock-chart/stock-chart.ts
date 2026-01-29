@@ -11,6 +11,6 @@ export class StockChart {
   private route = inject(ActivatedRoute);
   private data = toSignal(this.route.data);
   stockSymbol = computed(() => this.route.snapshot.paramMap.get('symbol'));
-  chartData = computed(() => this.data()?.['stockData'] as IChartApiResponse);
+  chartData = computed(() => this.data()?.['chartData'] as IChartApiResponse);
   ltp = computed(() => this.chartData()?.chart.result?.[0].meta.regularMarketPrice);
 }
