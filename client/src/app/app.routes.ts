@@ -17,7 +17,7 @@ export const routes: Routes = [
         },
         children: [
           {
-            path: ':symbol',
+            path: ':exchange/:symbol',
             loadComponent: () => import('../routes').then((m) => m.StockChart),
             resolve: {
               chartData: chartResolver,
