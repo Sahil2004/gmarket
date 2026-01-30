@@ -16,7 +16,7 @@ export class UserService {
   }
 
   isAuthenticated(): Observable<IUserData | IError> {
-    return this.http.get<IUserData | IError>('/users', {
+    return this.http.get<IUserData | IError>('/users/is-authenticated', {
       context: new HttpContext().set(SKIP_TOAST, true),
     });
   }

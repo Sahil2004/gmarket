@@ -293,3 +293,18 @@ func UpdateCurrentUser(imageService *services.ImageService) fiber.Handler {
 		return c.Status(fiber.StatusOK).JSON(newUser)
 	}
 }
+
+// GetAuthStatus godoc
+// @Summary Check authentication status
+// @Description Check if the user is authenticated
+// @Tags users
+// @Produce json
+// @Success 200 {object} dtos.SuccessDTO
+// @Failure 401 {object} dtos.ErrorDTO
+// @Router /users/is-authenticated [get]
+func GetAuthStatus(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(dtos.SuccessDTO{
+		Code:    fiber.StatusOK,
+		Message: "User is authenticated",
+	})
+}

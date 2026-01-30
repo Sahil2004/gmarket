@@ -15,4 +15,5 @@ func UserRoute(a *fiber.App, imageService *services.ImageService) {
 	userRouter.Delete("/", middlewares.AuthMiddleware, controllers.DeleteCurrentUser)
 	userRouter.Patch("/", middlewares.AuthMiddleware, controllers.UpdateCurrentUser(imageService))
 	userRouter.Post("/change-password", middlewares.AuthMiddleware, controllers.ChangePassword)
+	userRouter.Get("/is-authenticated", middlewares.AuthMiddleware, controllers.GetAuthStatus)
 }
