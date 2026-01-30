@@ -81,7 +81,7 @@ func GetMarketDepth(c *fiber.Ctx) error {
 		})
 	}
 
-	ltp, bids, asks, err := utils.GetMarketData(symbol, exchange)
+	ltp, _, bids, asks, err := utils.GetMarketData(symbol, exchange)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
@@ -98,4 +98,37 @@ func GetMarketDepth(c *fiber.Ctx) error {
 		"bids":     bids,
 		"asks":     asks,
 	})
+}
+
+// GetSymbolStatus godoc
+// @Summary Get Symbol Statuses
+// @Description GetSymbolStatus fetches the latest trading price and last close price for a list of symbols.
+// @Tags market
+// @Accept json
+// @Produce json
+// @Param symbols body dtos.SymbolListDTO true "List of Symbols"
+// @Success 200 {object} dtos.SymbolStatusDTO
+// @Failure 400 {object} dtos.ErrorDTO
+// @Failure 500 {object} dtos.ErrorDTO
+// @Router /market/symbols/status [post]
+func GetSymbolStatus(c *fiber.Ctx) error {
+	symbols := dtos.SymbolListDTO{}
+	if err := c.BodyParser(&symbols); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusBadRequest,
+			Message:    "Invalid request body",
+			DevMessage: err.Error(),
+		})
+	}
+
+	statuses, err := utils.GetSymbolsStatus(symbols.Symbols)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to fetch symbol statuses",
+			DevMessage: err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(statuses)
 }
