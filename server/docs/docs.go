@@ -164,6 +164,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/market/symbols/status": {
+            "post": {
+                "description": "GetSymbolStatus fetches the latest trading price and last close price for a list of symbols.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "market"
+                ],
+                "summary": "Get Symbol Statuses",
+                "parameters": [
+                    {
+                        "description": "List of Symbols",
+                        "name": "symbols",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SymbolListDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SymbolStatusDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/sessions": {
             "post": {
                 "description": "Create a new session for a user",
@@ -735,6 +781,41 @@ const docTemplate = `{
                 "exchange": {
                     "type": "string",
                     "example": "NSE"
+                },
+                "symbol": {
+                    "type": "string",
+                    "example": "RELIANCE"
+                }
+            }
+        },
+        "dtos.SymbolListDTO": {
+            "type": "object"
+        },
+        "dtos.SymbolStatusDTO": {
+            "type": "object",
+            "properties": {
+                "symbols": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.SymbolWithStatusDTO"
+                    }
+                }
+            }
+        },
+        "dtos.SymbolWithStatusDTO": {
+            "type": "object",
+            "properties": {
+                "exchange": {
+                    "type": "string",
+                    "example": "NSE"
+                },
+                "last_close_price": {
+                    "type": "string",
+                    "example": "2430.50"
+                },
+                "ltp": {
+                    "type": "string",
+                    "example": "2450.75"
                 },
                 "symbol": {
                     "type": "string",

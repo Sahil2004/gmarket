@@ -91,6 +91,30 @@ definitions:
         example: RELIANCE
         type: string
     type: object
+  dtos.SymbolListDTO:
+    type: object
+  dtos.SymbolStatusDTO:
+    properties:
+      symbols:
+        items:
+          $ref: '#/definitions/dtos.SymbolWithStatusDTO'
+        type: array
+    type: object
+  dtos.SymbolWithStatusDTO:
+    properties:
+      exchange:
+        example: NSE
+        type: string
+      last_close_price:
+        example: "2430.50"
+        type: string
+      ltp:
+        example: "2450.75"
+        type: string
+      symbol:
+        example: RELIANCE
+        type: string
+    type: object
   dtos.UpdateUserDTO:
     properties:
       email:
@@ -262,6 +286,37 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorDTO'
       summary: Get Market Symbols
+      tags:
+      - market
+  /market/symbols/status:
+    post:
+      consumes:
+      - application/json
+      description: GetSymbolStatus fetches the latest trading price and last close
+        price for a list of symbols.
+      parameters:
+      - description: List of Symbols
+        in: body
+        name: symbols
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.SymbolListDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.SymbolStatusDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Get Symbol Statuses
       tags:
       - market
   /sessions:
