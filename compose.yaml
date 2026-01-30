@@ -7,16 +7,30 @@ services:
             - 4200:4200
         depends_on:
             - server
+        develop:
+            watch:
+                - action: sync
+                  path: ./client
+                  target: /client
+                - action: restart
+                  path: ./client
     server:
         build:
             context: .
-            dockerfile: ./Dockerfile.server
+            dockerfile: ./Dockerfile.server.dev
         ports:
             - 3000:3000
         env_file:
             - ./server/.env
         depends_on:
             - db
+        develop:
+            watch:
+                - action: sync
+                  path: ./server
+                  target: /server
+                - action: restart
+                  path: ./server
     db:
         image: postgres:13
         environment:
