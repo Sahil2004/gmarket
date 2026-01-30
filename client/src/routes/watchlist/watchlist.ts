@@ -27,8 +27,8 @@ export class Watchlist {
   watchlist = computed(async () => {
     const update = this.watchlistUpdatedAt();
     try {
-      const watchlist = (await firstValueFrom(
-        this.watchlistService.getWatchlist(this.currentWatchlistIdx() + 1),
+      const watchlist = (await this.watchlistService.getWatchlist(
+        this.currentWatchlistIdx() + 1,
       )) as IWatchlist;
       return watchlist;
     } catch (err) {
@@ -46,13 +46,23 @@ export class Watchlist {
 
   addStockToWatchlist() {
     return (symbol: string, exchange: string) => {
-      return this.stockService.isAStockSymbol(symbol).subscribe((decision) => {
+      return this.stockService.isAStockSymbol(symbol).subscribe(async (decision) => {
         if (decision) {
-          this.watchlistService
-            .addStockToWatchlist(this.currentWatchlistIdx() + 1, symbol, exchange)
-            .subscribe((res) => {
-              this.updateWatchlists();
+          try {
+            await this.watchlistService.addStockToWatchlist(
+              this.currentWatchlistIdx() + 1,
+              symbol,
+              exchange,
+            );
+            this.updateWatchlists();
+          } catch (err) {
+            let snackBarRef = this._snackBar.open('Invalid stock symbol', 'Close', {
+              duration: 3000,
             });
+            snackBarRef.onAction().subscribe(() => {
+              snackBarRef.dismiss();
+            });
+          }
         } else {
           let snackBarRef = this._snackBar.open('Invalid stock symbol', 'Close', {
             duration: 3000,
@@ -78,14 +88,15 @@ export class Watchlist {
   }
 
   removeFromWatchlistHandler() {
-    return (symbol: string, exchange: string) => {
-      this.watchlistService
-        .removeStockFromWatchlist(this.currentWatchlistIdx() + 1, symbol, exchange)
-        .subscribe({
-          next: (res) => {
-            this.updateWatchlists();
-          },
-        });
+    return async (symbol: string, exchange: string) => {
+      try {
+        await this.watchlistService.removeStockFromWatchlist(
+          this.currentWatchlistIdx() + 1,
+          symbol,
+          exchange,
+        );
+        this.updateWatchlists();
+      } catch (err) {}
     };
   }
 
