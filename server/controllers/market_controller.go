@@ -57,3 +57,45 @@ func GetChartData(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(result)
 }
+
+// GetMarketDepth godoc
+// @Summary Get Market Depth Data
+// @Description GetMarketDepth fetches the latest price, bid, and ask levels for a given symbol.
+// @Tags market
+// @Accept json
+// @Produce json
+// @Param exchange query string true "Exchange (e.g., NSE)" default(NSE)
+// @Param symbol query string true "Stock Symbol (e.g., RELIANCE)" default(RELIANCE)
+// @Success 200 {object} dtos.MarketDepthDTO
+// @Failure 400 {object} dtos.ErrorDTO
+// @Failure 500 {object} dtos.ErrorDTO
+// @Router /market/depth [get]
+func GetMarketDepth(c *fiber.Ctx) error {
+	exchange := c.Query("exchange")
+	symbol := c.Query("symbol")
+
+	if exchange == "" || symbol == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+			Code:    fiber.StatusBadRequest,
+			Message: "Missing required query parameters",
+		})
+	}
+
+	ltp, bids, asks, err := utils.GetMarketData(symbol, exchange)
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusInternalServerError,
+			Message:    "Failed to fetch market depth data",
+			DevMessage: err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"symbol":   symbol,
+		"exchange": exchange,
+		"ltp":      ltp,
+		"bids":     bids,
+		"asks":     asks,
+	})
+}

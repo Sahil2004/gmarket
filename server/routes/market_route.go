@@ -11,4 +11,5 @@ func MarketRoute(a *fiber.App) {
 
 	marketRouter.Get("/symbols", middlewares.AuthMiddleware, controllers.GetSymbols)
 	marketRouter.Get("/chart", middlewares.AuthMiddleware, controllers.GetChartData)
+	marketRouter.Get("/depth", middlewares.AuthMiddleware, controllers.GetMarketDepth)
 }
