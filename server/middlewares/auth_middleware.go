@@ -16,7 +16,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	access_token := c.Cookies("access_token")
 	refresh_token := c.Cookies("refresh_token")
 
-	if access_token == "" || refresh_token == "" {
+	if (access_token == "" && refresh_token == "") || (refresh_token == "") {
 		return c.Status(fiber.StatusUnauthorized).JSON(dtos.ErrorDTO{
 			Code:       fiber.StatusUnauthorized,
 			Message:    "Access not allowed. Not logged in.",
