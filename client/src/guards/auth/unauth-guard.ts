@@ -4,14 +4,14 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-export const authGuard: CanActivateFn = async (route, state) => {
+export const unauthGuard: CanActivateFn = async (route, state) => {
   const userService = inject(UserService);
   const router = inject(Router);
   try {
     const user = await firstValueFrom(userService.isAuthenticated());
-    return true;
-  } catch (err) {
-    router.navigate(['/login']);
+    router.navigate(['/']);
     return false;
+  } catch (err) {
+    return true;
   }
 };
