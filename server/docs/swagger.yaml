@@ -30,6 +30,35 @@ definitions:
         example: Bad Request
         type: string
     type: object
+  dtos.LevelDTO:
+    properties:
+      orders:
+        type: integer
+      price:
+        type: number
+      qty:
+        type: integer
+    type: object
+  dtos.MarketDepthDTO:
+    properties:
+      asks:
+        items:
+          $ref: '#/definitions/dtos.LevelDTO'
+        type: array
+      bids:
+        items:
+          $ref: '#/definitions/dtos.LevelDTO'
+        type: array
+      exchange:
+        example: NSE
+        type: string
+      ltp:
+        example: 2450.75
+        type: number
+      symbol:
+        example: RELIANCE
+        type: string
+    type: object
   dtos.SessionDTO:
     properties:
       user:
@@ -184,6 +213,43 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorDTO'
       summary: Get Chart Data for a Symbol
+      tags:
+      - market
+  /market/depth:
+    get:
+      consumes:
+      - application/json
+      description: GetMarketDepth fetches the latest price, bid, and ask levels for
+        a given symbol.
+      parameters:
+      - default: NSE
+        description: Exchange (e.g., NSE)
+        in: query
+        name: exchange
+        required: true
+        type: string
+      - default: RELIANCE
+        description: Stock Symbol (e.g., RELIANCE)
+        in: query
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.MarketDepthDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Get Market Depth Data
       tags:
       - market
   /market/symbols:

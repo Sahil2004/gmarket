@@ -79,6 +79,59 @@
                 }
             }
         },
+        "/market/depth": {
+            "get": {
+                "description": "GetMarketDepth fetches the latest price, bid, and ask levels for a given symbol.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "market"
+                ],
+                "summary": "Get Market Depth Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "NSE",
+                        "description": "Exchange (e.g., NSE)",
+                        "name": "exchange",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "RELIANCE",
+                        "description": "Stock Symbol (e.g., RELIANCE)",
+                        "name": "symbol",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MarketDepthDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/market/symbols": {
             "get": {
                 "description": "GetSymbols serves the list of market symbols from a static JSON file.",
@@ -564,6 +617,49 @@
                 "message": {
                     "type": "string",
                     "example": "Bad Request"
+                }
+            }
+        },
+        "dtos.LevelDTO": {
+            "type": "object",
+            "properties": {
+                "orders": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "qty": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.MarketDepthDTO": {
+            "type": "object",
+            "properties": {
+                "asks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.LevelDTO"
+                    }
+                },
+                "bids": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.LevelDTO"
+                    }
+                },
+                "exchange": {
+                    "type": "string",
+                    "example": "NSE"
+                },
+                "ltp": {
+                    "type": "number",
+                    "example": 2450.75
+                },
+                "symbol": {
+                    "type": "string",
+                    "example": "RELIANCE"
                 }
             }
         },
