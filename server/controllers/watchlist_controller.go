@@ -57,8 +57,6 @@ func GetWatchlist(c *fiber.Ctx) error {
 
 	for _, symbol := range watchlist.Symbols {
 		actualSymbol, exchange := utils.ParseDBStockSymbol(symbol)
-		fullSymbol := utils.GetStockSymbolWithExchange(actualSymbol, exchange)
-		exchangeData, err := utils.GetExchangeData(fullSymbol, "1d", "1m")
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
 				Code:       fiber.StatusInternalServerError,
@@ -66,35 +64,9 @@ func GetWatchlist(c *fiber.Ctx) error {
 				DevMessage: err.Error(),
 			})
 		}
-
-		chart, ok := exchangeData["chart"].(map[string]interface{})
-		if !ok || chart == nil {
-			continue
-		}
-
-		results, ok := chart["result"].([]interface{})
-		if !ok || len(results) == 0 || results[0] == nil {
-			continue
-		}
-
-		result0, ok := results[0].(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		meta, ok := result0["meta"].(map[string]interface{})
-		if !ok || meta == nil {
-			continue
-		}
-
-		ltp, _ := meta["regularMarketPrice"].(float64)
-		lastClose, _ := meta["chartPreviousClose"].(float64)
-
 		symbolInfos = append(symbolInfos, dtos.SymbolInfo{
-			Symbol:         actualSymbol,
-			Exchange:       exchange,
-			LTP:            ltp,
-			LastClosePrice: lastClose,
+			Symbol:   actualSymbol,
+			Exchange: exchange,
 		})
 	}
 
