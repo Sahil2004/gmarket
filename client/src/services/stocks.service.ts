@@ -8,10 +8,11 @@ import { map, shareReplay, type Observable } from 'rxjs';
 })
 export class StocksService {
   private http = inject(HttpClient);
-  private stocks$!: Observable<IStock[]>;
+  private stocks$: Observable<IStock[]> = this.http
+    .get<IStock[]>('/market/symbols')
+    .pipe(shareReplay(1));
 
   getAllStocks(): Observable<IStock[]> {
-    this.stocks$ = this.http.get<IStock[]>('/market/symbols').pipe(shareReplay(1));
     return this.stocks$;
   }
 
