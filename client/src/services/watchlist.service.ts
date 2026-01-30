@@ -43,8 +43,6 @@ export class WatchlistService {
       this.watchlists[watchlistIndex].symbols.push({
         symbol: stockSymbol,
         exchange: exchange,
-        ltp: 0,
-        last_close_price: 0,
       });
     } catch (err) {}
   }
