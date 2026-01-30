@@ -87,12 +87,6 @@ definitions:
       exchange:
         example: NSE
         type: string
-      last_close_price:
-        example: 2430.5
-        type: number
-      ltp:
-        example: 2450.75
-        type: number
       symbol:
         example: RELIANCE
         type: string
@@ -435,6 +429,23 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorDTO'
       summary: Change user password
+      tags:
+      - users
+  /users/is-authenticated:
+    get:
+      description: Check if the user is authenticated
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.SuccessDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorDTO'
+      summary: Check authentication status
       tags:
       - users
   /watchlists/{watchlist_idx}:

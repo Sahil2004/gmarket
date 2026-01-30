@@ -1,10 +1,8 @@
 package dtos
 
 type SymbolInfo struct {
-	Symbol         string  `json:"symbol" example:"RELIANCE"`
-	Exchange       string  `json:"exchange" example:"NSE"`
-	LTP            float64 `json:"ltp" example:"2450.75"`
-	LastClosePrice float64 `json:"last_close_price" example:"2430.50"`
+	Symbol   string `json:"symbol" example:"RELIANCE"`
+	Exchange string `json:"exchange" example:"NSE"`
 }
 
 type WatchlistDTO struct {

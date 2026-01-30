@@ -412,6 +412,32 @@
                 }
             }
         },
+        "/users/is-authenticated": {
+            "get": {
+                "description": "Check if the user is authenticated",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Check authentication status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.SuccessDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/watchlists/{watchlist_idx}": {
             "get": {
                 "description": "Retrieve the specified watchlist for the authenticated user",
@@ -703,14 +729,6 @@
                 "exchange": {
                     "type": "string",
                     "example": "NSE"
-                },
-                "last_close_price": {
-                    "type": "number",
-                    "example": 2430.5
-                },
-                "ltp": {
-                    "type": "number",
-                    "example": 2450.75
                 },
                 "symbol": {
                     "type": "string",
