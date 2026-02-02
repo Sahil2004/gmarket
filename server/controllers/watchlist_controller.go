@@ -46,8 +46,8 @@ func GetWatchlist(c *fiber.Ctx) error {
 	watchlist, err := db.GetWatchlist(user.ID.String(), idx)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
+		return c.Status(fiber.StatusNotFound).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusNotFound,
 			Message:    "Failed to retrieve watchlist",
 			DevMessage: err.Error(),
 		})
