@@ -20,7 +20,7 @@ export class StocksList {
   @Input() getStockData: (symbols: IWatchlistSymbol[]) => Promise<IWatchlistSymbolInfo[]> = () => {
     return Promise.resolve([]);
   };
-  @Input() refreshAfterMs: number = 1 * 1000; // 15 seconds
+  @Input() refreshAfterMs: number = 2 * 1000; // 2 seconds
 
   @ViewChild(CdkVirtualScrollViewport)
   viewport!: CdkVirtualScrollViewport;
@@ -61,7 +61,7 @@ export class StocksList {
     this.updateStockData(visibleStocks);
     if (this.intervalId !== null) clearInterval(this.intervalId);
     this.intervalId = setInterval(async () => {
-      this.updateStockData(visibleStocks);
+      await this.updateStockData(visibleStocks);
     }, this.refreshAfterMs);
   }
 

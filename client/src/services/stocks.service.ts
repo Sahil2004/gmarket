@@ -13,6 +13,21 @@ export class StocksService {
     .get<IStock[]>('/market/symbols')
     .pipe(shareReplay(1));
   private stocksListWithData: IWatchlistSymbolInfo[] = [];
+  private fetchedData: { symbols: IWatchlistSymbolInfo[] } = { symbols: [] };
+  private symbolsToFetchSet: IWatchlistSymbol[] = [];
+
+  constructor() {
+    // Polling
+    setInterval(async () => {
+      if (this.stocksListWithData.length > 0) {
+        this.fetchedData = await firstValueFrom(
+          this.http.post<{ symbols: IWatchlistSymbolInfo[] }>('/market/symbols/status', {
+            symbols: this.symbolsToFetchSet,
+          }),
+        );
+      }
+    }, 500);
+  }
 
   getAllStocks(): Observable<IStock[]> {
     return this.stocks$;
@@ -26,6 +41,16 @@ export class StocksService {
   }
 
   async getStocksData(symbols: IWatchlistSymbol[]): Promise<IWatchlistSymbolInfo[]> {
+    // process the fetched data
+    const fetchedDataMap = new Map<string, IWatchlistSymbolInfo>();
+    for (const item of this.fetchedData.symbols) {
+      fetchedDataMap.set(item.symbol, item);
+    }
+    this.stocksListWithData = this.stocksListWithData.map((stock) => {
+      const updatedData = fetchedDataMap.get(stock.symbol);
+      return updatedData ? updatedData : stock;
+    });
+    // Update the stocks list to match the requested symbols
     const incomingSymbolSet = new Set(symbols.map((s) => s.symbol));
     this.stocksListWithData = this.stocksListWithData.filter((stock) =>
       incomingSymbolSet.has(stock.symbol),
@@ -43,6 +68,7 @@ export class StocksService {
 
       this.stocksListWithData.push(...fetchedData.symbols);
     }
+    this.symbolsToFetchSet = symbols;
 
     return this.stocksListWithData;
   }
