@@ -7,6 +7,7 @@ import { IStock } from '../../types/stocks.types';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IWatchlist, IWatchlistSymbol } from '../../types';
+import { DESIGN_SYSTEM } from '../../config';
 
 @Component({
   selector: 'watchlist',
@@ -20,6 +21,9 @@ export class Watchlist {
   private stockService = inject(StocksService);
   private watchlistService = inject(WatchlistService);
   private _snackBar = inject(MatSnackBar);
+  private ds = inject(DESIGN_SYSTEM);
+
+  throttlingTimeMs = this.ds.devConfig.throttlingTimeMs;
 
   currentWatchlistIdx = signal<number>(0);
   watchlistUpdatedAt = signal<Date | null>(null);

@@ -15,9 +15,14 @@ interface IColorSystem {
   theme: 'light' | 'dark' | 'system';
 }
 
+interface IDevConfigSystem {
+  throttlingTimeMs: number;
+}
+
 export interface IDesignSystem {
   app: IAppSystem;
   color: IColorSystem;
   typography: ITypographySystem;
   surface: ISurfaceSystem;
+  devConfig: IDevConfigSystem;
 }

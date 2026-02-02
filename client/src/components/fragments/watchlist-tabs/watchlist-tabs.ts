@@ -18,6 +18,7 @@ export class WatchlistTabs {
   @Input() getStockData: (symbols: IWatchlistSymbol[]) => Promise<IWatchlistSymbolInfo[]> = () => {
     return Promise.resolve([]);
   };
+  @Input() throttlingTimeMs: number = 2 * 1000; // 2 seconds
 
   numbers: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
 }
