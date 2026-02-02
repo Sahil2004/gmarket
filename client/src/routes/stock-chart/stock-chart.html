@@ -50,7 +50,7 @@
   <div class="flex justify-center text-sm text-gray-600">
     Spread:
     <span class="ml-1 font-medium">
-      {{ ((depthData().asks?.[0]?.price ?? 0) - (depthData().bids?.[0]?.price ?? 0)).toFixed(2) }}
+      {{ ((depthData().asks[0]?.price ?? 0) - (depthData().bids[0]?.price ?? 0)).toFixed(2) }}
     </span>
   </div>
 </section>

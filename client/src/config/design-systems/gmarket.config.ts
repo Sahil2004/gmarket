@@ -14,4 +14,7 @@ export class GMarket implements IDesignSystem {
     MatFormFieldAppearance: 'outline',
     MatCardAppearance: 'outlined',
   };
+  devConfig: IDesignSystem['devConfig'] = {
+    throttlingTimeMs: 2 * 1000, // 2 seconds
+  };
 }
