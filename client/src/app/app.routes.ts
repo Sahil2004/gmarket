@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, unauthGuard } from '../guards';
-import { chartResolver, stockResolver, userResolver } from '../resolvers';
+import { depthResolver, stockResolver, userResolver } from '../resolvers';
 
 export const routes: Routes = [
   {
@@ -20,7 +20,7 @@ export const routes: Routes = [
             path: ':exchange/:symbol',
             loadComponent: () => import('../routes').then((m) => m.StockChart),
             resolve: {
-              chartData: chartResolver,
+              depthData: depthResolver,
             },
             runGuardsAndResolvers: 'paramsOrQueryParamsChange',
           },

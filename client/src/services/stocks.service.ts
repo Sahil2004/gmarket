@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { IChartApiResponse, IStock } from '../types/stocks.types';
+import { IMarketDepth, IStock } from '../types/stocks.types';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, map, shareReplay, type Observable } from 'rxjs';
 import { IWatchlistSymbol, IWatchlistSymbolInfo } from '../types';
+import e from 'express';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,8 @@ export class StocksService {
   private stocksListWithData: IWatchlistSymbolInfo[] = [];
   private fetchedData: { symbols: IWatchlistSymbolInfo[] } = { symbols: [] };
   private symbolsToFetchSet: IWatchlistSymbol[] = [];
+  private depthStock: IWatchlistSymbol | null = null;
+  private fetchedDepthData: IMarketDepth | null = null;
 
   constructor() {
     // Polling
@@ -23,6 +26,16 @@ export class StocksService {
         this.fetchedData = await firstValueFrom(
           this.http.post<{ symbols: IWatchlistSymbolInfo[] }>('/market/symbols/status', {
             symbols: this.symbolsToFetchSet,
+          }),
+        );
+      }
+      if (this.depthStock !== null) {
+        this.fetchedDepthData = await firstValueFrom(
+          this.http.get<IMarketDepth>('/market/depth', {
+            params: {
+              symbol: this.depthStock.symbol,
+              exchange: this.depthStock.exchange,
+            },
           }),
         );
       }
@@ -73,19 +86,22 @@ export class StocksService {
     return this.stocksListWithData;
   }
 
-  getChartData(
-    symbol: string,
-    exchange: string,
-    interval: string,
-    range: string,
-  ): Observable<IChartApiResponse> {
-    return this.http.get<IChartApiResponse>('/market/chart', {
-      params: {
-        exchange,
-        symbol,
-        range,
-        interval,
-      },
-    });
+  async getDepthData(symbol: string, exchange: string): Promise<IMarketDepth> {
+    if (
+      this.depthStock === null ||
+      this.depthStock.symbol !== symbol ||
+      this.depthStock.exchange !== exchange
+    ) {
+      this.depthStock = { symbol, exchange };
+      this.fetchedDepthData = await firstValueFrom(
+        this.http.get<IMarketDepth>('/market/depth', {
+          params: {
+            exchange,
+            symbol,
+          },
+        }),
+      );
+    }
+    return this.fetchedDepthData as IMarketDepth;
   }
 }
