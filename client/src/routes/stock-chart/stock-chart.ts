@@ -1,16 +1,20 @@
 import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IChartApiResponse } from '../../types/stocks.types';
+import { IMarketDepth } from '../../types';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'stock-chart',
   templateUrl: 'stock-chart.html',
+  imports: [MatTableModule],
 })
 export class StockChart {
   private route = inject(ActivatedRoute);
   private data = toSignal(this.route.data);
-  stockSymbol = computed(() => this.route.snapshot.paramMap.get('symbol'));
-  chartData = computed(() => this.data()?.['chartData'] as IChartApiResponse);
-  ltp = computed(() => this.chartData()?.chart.result?.[0].meta.regularMarketPrice);
+  private params = toSignal(this.route.paramMap);
+  stockSymbol = computed(() => this.params()?.get('symbol'));
+  exchange = computed(() => this.params()?.get('exchange'));
+  depthData = computed(() => this.data()?.['depthData'] as IMarketDepth);
+  displayedColumns: string[] = ['price', 'orders', 'qty'];
 }

@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, ResolveFn, RouterStateSnapshot } from '@angular/router';
 import { StocksService } from '../services';
-import { IChartApiResponse } from '../types/stocks.types';
+import { IMarketDepth } from '../types';
 
-export const chartResolver: ResolveFn<IChartApiResponse> = (
+export const depthResolver: ResolveFn<IMarketDepth> = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot,
 ) => {
   let stockSymbol = route.paramMap.get('symbol')!;
   let exchange = route.paramMap.get('exchange')!;
   let stockService = inject(StocksService);
-  return stockService.getChartData(stockSymbol, exchange, '1d', '5d');
+  return stockService.getDepthData(stockSymbol, exchange);
 };
