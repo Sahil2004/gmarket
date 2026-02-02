@@ -79,4 +79,28 @@
       <button matButton="filled" (click)="deleteAccountHandler()">Delete Account</button>
     </span>
   </mat-grid-tile>
+  <mat-grid-tile rowspan="2">
+    <span class="w-full flex flex-col gap-8">
+      <h1 class="text-3xl">Configure</h1>
+      <mat-form-field>
+        <mat-label>Throttling Time</mat-label>
+        <mat-select [(value)]="throttlingSelection" (selectionChange)="updateThrottling()">
+          <mat-option [value]="1000">1 sec</mat-option>
+          <mat-option [value]="2000">2 sec</mat-option>
+          <mat-option [value]="5000">5 sec</mat-option>
+          <mat-option [value]="10000">10 sec</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Polling Time</mat-label>
+        <mat-select [(value)]="pollingSelection" (selectionChange)="updatePolling()">
+          <mat-option [value]="500">0.5 sec</mat-option>
+          <mat-option [value]="1000">1 sec</mat-option>
+          <mat-option [value]="2000">2 sec</mat-option>
+          <mat-option [value]="5000">5 sec</mat-option>
+          <mat-option [value]="10000">10 sec</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </span>
+  </mat-grid-tile>
 </mat-grid-list>

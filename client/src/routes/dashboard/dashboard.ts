@@ -44,8 +44,8 @@ export class Dashboard {
           ? 'light'
           : 'dark'
         : this.ds.color.theme === 'light'
-        ? 'dark'
-        : 'light';
+          ? 'dark'
+          : 'light';
     document.documentElement.style.setProperty('--theme', this.ds.color.theme);
   }
 }

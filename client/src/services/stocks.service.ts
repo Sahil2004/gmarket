@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, map, shareReplay, type Observable } from 'rxjs';
 import { IWatchlistSymbol, IWatchlistSymbolInfo } from '../types';
 import e from 'express';
+import { DESIGN_SYSTEM } from '../config';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,7 @@ export class StocksService {
   private symbolsToFetchSet: IWatchlistSymbol[] = [];
   private depthStock: IWatchlistSymbol | null = null;
   private fetchedDepthData: IMarketDepth | null = null;
+  private ds = inject(DESIGN_SYSTEM);
 
   constructor() {
     // Polling
@@ -39,7 +41,7 @@ export class StocksService {
           }),
         );
       }
-    }, 500);
+    }, this.ds.devConfig.pollingTimeMs);
   }
 
   getAllStocks(): Observable<IStock[]> {

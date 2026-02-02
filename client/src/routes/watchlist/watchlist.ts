@@ -23,7 +23,10 @@ export class Watchlist {
   private _snackBar = inject(MatSnackBar);
   private ds = inject(DESIGN_SYSTEM);
 
-  throttlingTimeMs = this.ds.devConfig.throttlingTimeMs;
+  throttlingTimeMs = computed(() => {
+    console.log(this.ds.devConfig.throttlingTimeMs);
+    return this.ds.devConfig.throttlingTimeMs;
+  });
 
   currentWatchlistIdx = signal<number>(0);
   watchlistUpdatedAt = signal<Date | null>(null);

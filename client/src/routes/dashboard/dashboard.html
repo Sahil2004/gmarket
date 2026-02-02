@@ -11,8 +11,8 @@
           ? 'light_mode'
           : 'dark_mode'
         : ds.color.theme === 'light'
-        ? 'dark_mode'
-        : 'light_mode'
+          ? 'dark_mode'
+          : 'light_mode'
     }}</mat-icon>
   </button>
 </mat-toolbar>
@@ -20,17 +20,17 @@
   <mat-sidenav #sidenav mode="side" [(opened)]="opened">
     <mat-nav-list>
       @for (link of navItems; track link) {
-      <a
-        mat-list-item
-        [routerLink]="['/' + link.label]"
-        (click)="$event.preventDefault(); activeLink = link.label"
-        [activated]="activeLink === link.label"
-      >
-        <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
-        <span matListItemTitle>
-          {{ link.label | titlecase }}
-        </span>
-      </a>
+        <a
+          mat-list-item
+          [routerLink]="['/' + link.label]"
+          (click)="$event.preventDefault(); activeLink = link.label"
+          [activated]="activeLink === link.label"
+        >
+          <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+          <span matListItemTitle>
+            {{ link.label | titlecase }}
+          </span>
+        </a>
       }
     </mat-nav-list>
   </mat-sidenav>

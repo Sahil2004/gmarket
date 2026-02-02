@@ -16,5 +16,6 @@ export class GMarket implements IDesignSystem {
   };
   devConfig: IDesignSystem['devConfig'] = {
     throttlingTimeMs: 2 * 1000, // 2 seconds
+    pollingTimeMs: 500, // 500 ms
   };
 }
