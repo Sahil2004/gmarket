@@ -57,13 +57,6 @@ func GetWatchlist(c *fiber.Ctx) error {
 
 	for _, symbol := range watchlist.Symbols {
 		actualSymbol, exchange := utils.ParseDBStockSymbol(symbol)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-				Code:       fiber.StatusInternalServerError,
-				Message:    "Failed to fetch symbol data",
-				DevMessage: err.Error(),
-			})
-		}
 		symbolInfos = append(symbolInfos, dtos.SymbolInfo{
 			Symbol:   actualSymbol,
 			Exchange: exchange,
