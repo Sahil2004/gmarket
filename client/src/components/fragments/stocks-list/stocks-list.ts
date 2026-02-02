@@ -20,18 +20,30 @@ export class StocksList {
   @Input() getStockData: (symbols: IWatchlistSymbol[]) => Promise<IWatchlistSymbolInfo[]> = () => {
     return Promise.resolve([]);
   };
-  @Input() refreshAfterMs: number = 15 * 1000; // 15 seconds
+  @Input() refreshAfterMs: number = 1 * 1000; // 15 seconds
 
   @ViewChild(CdkVirtualScrollViewport)
   viewport!: CdkVirtualScrollViewport;
 
   ITEM_SIZE = 48;
 
-  stockList = signal<IWatchlistSymbolInfo[]>([]);
+  stockDataMap = signal<Map<string, IWatchlistSymbolInfo>>(new Map());
   intervalId: ReturnType<typeof setInterval> | null = null;
 
   trackBySymbol(index: number, stock: IWatchlistSymbol) {
     return stock.symbol;
+  }
+
+  async updateStockData(visibleStocks: IWatchlistSymbol[]) {
+    const data = await this.getStockData(visibleStocks);
+
+    this.stockDataMap.update((map) => {
+      const next = new Map(map);
+      for (const item of data) {
+        next.set(item.symbol, item);
+      }
+      return next;
+    });
   }
 
   onScroll() {
@@ -46,13 +58,10 @@ export class StocksList {
       Math.ceil((scrollOffset + viewportHeight) / this.ITEM_SIZE),
     );
     const visibleStocks = this.stocks.slice(startIndex, endIndex);
-    console.log(visibleStocks);
-    (async () => {
-      this.stockList.set(await this.getStockData(visibleStocks));
-    })();
+    this.updateStockData(visibleStocks);
     if (this.intervalId !== null) clearInterval(this.intervalId);
     this.intervalId = setInterval(async () => {
-      this.stockList.set(await this.getStockData(visibleStocks));
+      this.updateStockData(visibleStocks);
     }, this.refreshAfterMs);
   }
 

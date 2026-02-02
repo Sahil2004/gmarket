@@ -12,14 +12,23 @@
         <a [routerLink]="['/watchlist/' + stock.exchange + '/' + stock.symbol]">{{
           stock.symbol
         }}</a>
-        <!-- <span class="flex justify-between items-center gap-2 group-hover:hidden">
-          <p class="text-gray-500">
-            {{ (stock.ltp - stock.last_close_price).toFixed(2) }}
-          </p>
-          <p>
-            {{ stock.ltp.toFixed(2) }}
-          </p>
-        </span> -->
+        @if (stockDataMap().get(stock.symbol); as data) {
+          <span class="flex justify-between items-center gap-2 group-hover:hidden">
+            <p class="text-gray-500">
+              {{ (data.ltp - data.last_close_price).toFixed(2) }}
+            </p>
+            <p
+              [class.text-green-600]="data.ltp >= data.last_close_price"
+              [class.text-red-600]="data.ltp < data.last_close_price"
+            >
+              {{ data.ltp }}
+            </p>
+          </span>
+        } @else {
+          <span class="flex justify-between items-center gap-2 group-hover:hidden text-gray-400">
+            --
+          </span>
+        }
         <span class="hidden justify-between items-center gap-2 group-hover:flex">
           @if (displayActions) {
             <button matButton="filled" (click)="buyHandler(stock.symbol)">B</button>
