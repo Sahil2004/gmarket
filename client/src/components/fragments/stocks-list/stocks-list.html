@@ -1,6 +1,13 @@
-<mat-nav-list>
-  @for (stock of stocks; track stock.symbol) {
-    <mat-list-item [activated]="activated(stock.symbol)">
+<cdk-virtual-scroll-viewport
+  [itemSize]="ITEM_SIZE"
+  (scrolledIndexChange)="onScroll()"
+  class="h-[70vh] w-full"
+>
+  <mat-nav-list>
+    <mat-list-item
+      [activated]="activated(stock.symbol)"
+      *cdkVirtualFor="let stock of stocks; trackBy: trackBySymbol"
+    >
       <span class="flex justify-between items-center group">
         <a [routerLink]="['/watchlist/' + stock.exchange + '/' + stock.symbol]">{{
           stock.symbol
@@ -28,5 +35,5 @@
         </span>
       </span>
     </mat-list-item>
-  }
-</mat-nav-list>
+  </mat-nav-list>
+</cdk-virtual-scroll-viewport>

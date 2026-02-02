@@ -1,7 +1,7 @@
 import { Component, Input, output } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { StocksList } from '../stocks-list/stocks-list';
-import { IWatchlist } from '../../../types';
+import { IWatchlist, IWatchlistSymbol, IWatchlistSymbolInfo } from '../../../types';
 import { AsyncPipe } from '@angular/common';
 
 @Component({
@@ -15,6 +15,9 @@ export class WatchlistTabs {
   @Input() buyHandler: (stock: string) => void = () => {};
   @Input() sellHandler: (stock: string) => void = () => {};
   @Input() removeFromWatchlistHandler: (symbol: string, exchange: string) => void = () => {};
+  @Input() getStockData: (symbols: IWatchlistSymbol[]) => Promise<IWatchlistSymbolInfo[]> = () => {
+    return Promise.resolve([]);
+  };
 
   numbers: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
 }

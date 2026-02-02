@@ -4,10 +4,9 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { Search, WatchlistTabs } from '../../components';
 import { StocksService, WatchlistService } from '../../services';
 import { IStock } from '../../types/stocks.types';
-import { firstValueFrom } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IWatchlist } from '../../types';
+import { IWatchlist, IWatchlistSymbol } from '../../types';
 
 @Component({
   selector: 'watchlist',
@@ -102,5 +101,11 @@ export class Watchlist {
 
   watchlistChangeHandler() {
     return (event: { index: number }) => this.currentWatchlistIdx.set(event.index);
+  }
+
+  getStockDataHandler() {
+    return (symbols: IWatchlistSymbol[]) => {
+      return this.stockService.getStocksData(symbols);
+    };
   }
 }
