@@ -11,6 +11,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { DESIGN_SYSTEM } from '../../config';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'profile',
@@ -22,6 +24,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
     MatButtonModule,
     ReactiveFormsModule,
     InputImage,
+    MatSelectModule,
   ],
 })
 export class Profile {
@@ -30,6 +33,7 @@ export class Profile {
   readonly fb = inject(FormBuilder);
   readonly _snackBar = inject(MatSnackBar);
   readonly _dialog = inject(MatDialog);
+  readonly ds = inject(DESIGN_SYSTEM);
 
   private route = inject(ActivatedRoute);
   private data = toSignal(this.route.data);
@@ -43,6 +47,15 @@ export class Profile {
       return this.data()?.['userData'] as IUserData;
     }
   });
+
+  throttlingSelection = this.ds.devConfig.throttlingTimeMs;
+  updateThrottling() {
+    this.ds.devConfig.throttlingTimeMs = this.throttlingSelection;
+  }
+  pollingSelection = this.ds.devConfig.pollingTimeMs;
+  updatePolling() {
+    this.ds.devConfig.pollingTimeMs = this.pollingSelection;
+  }
 
   profilePhotoUri = signal<string | null>(this.user().profile_picture_url || null);
 

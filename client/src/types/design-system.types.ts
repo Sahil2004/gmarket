@@ -1,3 +1,5 @@
+import { Signal } from '@angular/core';
+
 interface IAppSystem {
   APP_NAME: string;
 }
@@ -17,6 +19,7 @@ interface IColorSystem {
 
 interface IDevConfigSystem {
   throttlingTimeMs: number;
+  pollingTimeMs: number;
 }
 
 export interface IDesignSystem {
