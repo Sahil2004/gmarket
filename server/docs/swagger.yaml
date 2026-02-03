@@ -183,56 +183,6 @@ info:
   title: GMarket API
   version: "1.0"
 paths:
-  /market/chart:
-    get:
-      consumes:
-      - application/json
-      description: GetChartData fetches chart data for a given symbol from an external
-        API.
-      parameters:
-      - default: NSE
-        description: Exchange (e.g., NSE)
-        in: query
-        name: exchange
-        required: true
-        type: string
-      - default: RELIANCE
-        description: Stock Symbol (e.g., RELIANCE)
-        in: query
-        name: symbol
-        required: true
-        type: string
-      - default: 1d
-        description: Chart Range (e.g., 1d, 5d, 1mo)
-        in: query
-        name: range
-        required: true
-        type: string
-      - default: 1m
-        description: Data Interval (e.g., 1m, 5m, 1h)
-        in: query
-        name: interval
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorDTO'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dtos.ErrorDTO'
-      summary: Get Chart Data for a Symbol
-      tags:
-      - market
   /market/depth:
     get:
       consumes:
