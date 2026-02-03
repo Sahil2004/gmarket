@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/Sahil2004/gmarket/server/database"
 	"github.com/Sahil2004/gmarket/server/routes"
 	"github.com/Sahil2004/gmarket/server/services"
 	"github.com/gofiber/fiber/v2"
@@ -15,6 +16,12 @@ import (
 // @host localhost:3000
 // @BasePath /api
 func main() {
+	queries, err := database.OpenDBConnection()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -36,10 +43,10 @@ func main() {
 	}
 
 	routes.SwaggerRoute(api)
-	routes.SessionRoute(api)
-	routes.UserRoute(api, imageService)
+	routes.SessionRoute(api, queries)
+	routes.UserRoute(api, queries, imageService)
 	routes.MarketRoute(api)
-	routes.WatchlistRoute(api)
+	routes.WatchlistRoute(api, queries)
 
 	routes.NotFoundRoute(api)
 

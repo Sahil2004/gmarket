@@ -10,6 +10,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type SessionController struct {
+	Queries *database.Queries
+}
+
+func NewSessionController(queries *database.Queries) *SessionController {
+	return &SessionController{
+		Queries: queries,
+	}
+}
+
 // CreateSession godoc
 // @Summary Create a new session (login)
 // @Description Create a new session for a user
@@ -20,7 +30,7 @@ import (
 // @Success 201 {object} dtos.SessionDTO
 // @Failure 400 {object} dtos.ErrorDTO
 // @Router /sessions [post]
-func CreateSession(c *fiber.Ctx) error {
+func (sc *SessionController) CreateSession(c *fiber.Ctx) error {
 	loginData := &dtos.CreateSessionDTO{}
 	if err := c.BodyParser(loginData); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
@@ -30,16 +40,7 @@ func CreateSession(c *fiber.Ctx) error {
 		})
 	}
 
-	db, err := database.OpenDBConnection()
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Failed to connect to database",
-			DevMessage: err.Error(),
-		})
-	}
-
-	userData, err := db.GetUserByEmail(loginData.Email)
+	userData, err := sc.Queries.GetUserByEmail(loginData.Email)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
 			Code:       fiber.StatusBadRequest,
@@ -110,7 +111,7 @@ func CreateSession(c *fiber.Ctx) error {
 		CreatedAt:    time.Now(),
 	}
 
-	if err := db.CreateSession(*session); err != nil {
+	if err := sc.Queries.CreateSession(*session); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
 			Code:       fiber.StatusInternalServerError,
 			Message:    "Failed to create session",
@@ -134,20 +135,10 @@ func CreateSession(c *fiber.Ctx) error {
 // @Success 200 {object} dtos.SuccessDTO
 // @Failure 401 {object} dtos.ErrorDTO
 // @Router /sessions [delete]
-func DeleteCurrentSession(c *fiber.Ctx) error {
+func (sc *SessionController) DeleteCurrentSession(c *fiber.Ctx) error {
 	refreshToken := c.Cookies("refresh_token")
 
-	db, err := database.OpenDBConnection()
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Failed to connect to database",
-			DevMessage: err.Error(),
-		})
-	}
-
-	if err := db.DeleteSession(refreshToken); err != nil {
+	if err := sc.Queries.DeleteSession(refreshToken); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
 			Code:       fiber.StatusInternalServerError,
 			Message:    "Failed to delete session",

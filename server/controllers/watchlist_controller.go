@@ -9,6 +9,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type WatchlistController struct {
+	Queries *database.Queries
+}
+
+func NewWatchlistController(queries *database.Queries) *WatchlistController {
+	return &WatchlistController{
+		Queries: queries,
+	}
+}
+
 // GetWatchlist godoc
 // @Summary Get a user's watchlist
 // @Description Retrieve the specified watchlist for the authenticated user
@@ -20,7 +30,7 @@ import (
 // @Failure 401 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
 // @Router /watchlists/{watchlist_idx} [get]
-func GetWatchlist(c *fiber.Ctx) error {
+func (wc *WatchlistController) GetWatchlist(c *fiber.Ctx) error {
 	idx, err := strconv.Atoi(c.Params("watchlist_idx"))
 
 	if err != nil || idx < 1 || idx > 10 {
@@ -33,17 +43,7 @@ func GetWatchlist(c *fiber.Ctx) error {
 
 	user := c.UserContext().Value("user").(dtos.UserDTO)
 
-	db, err := database.OpenDBConnection()
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Database connection error",
-			DevMessage: err.Error(),
-		})
-	}
-
-	watchlist, err := db.GetWatchlist(user.ID.String(), idx)
+	watchlist, err := wc.Queries.GetWatchlist(user.ID.String(), idx)
 
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(dtos.ErrorDTO{
@@ -84,7 +84,7 @@ func GetWatchlist(c *fiber.Ctx) error {
 // @Failure 401 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
 // @Router /watchlists/{watchlist_idx}/symbols [post]
-func AddSymbolToWatchlist(c *fiber.Ctx) error {
+func (wc *WatchlistController) AddSymbolToWatchlist(c *fiber.Ctx) error {
 	idx, err := strconv.Atoi(c.Params("watchlist_idx"))
 
 	if err != nil || idx < 1 || idx > 10 {
@@ -105,20 +105,11 @@ func AddSymbolToWatchlist(c *fiber.Ctx) error {
 		})
 	}
 
-	db, err := database.OpenDBConnection()
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Database connection error",
-			DevMessage: err.Error(),
-		})
-	}
-
 	user := c.UserContext().Value("user").(dtos.UserDTO)
 
 	dbSymbol := utils.GenerateDBStockSymbol(symbol.Symbol, symbol.Exchange)
 
-	db.AddSymbolToWatchlist(user.ID.String(), idx, dbSymbol)
+	wc.Queries.AddSymbolToWatchlist(user.ID.String(), idx, dbSymbol)
 
 	return c.Status(fiber.StatusOK).JSON(dtos.SuccessDTO{
 		Code:    fiber.StatusOK,
@@ -139,7 +130,7 @@ func AddSymbolToWatchlist(c *fiber.Ctx) error {
 // @Failure 401 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
 // @Router /watchlists/{watchlist_idx}/symbols [delete]
-func RemoveSymbolFromWatchlist(c *fiber.Ctx) error {
+func (wc *WatchlistController) RemoveSymbolFromWatchlist(c *fiber.Ctx) error {
 	idx, err := strconv.Atoi(c.Params("watchlist_idx"))
 
 	if err != nil || idx < 1 || idx > 10 {
@@ -160,20 +151,10 @@ func RemoveSymbolFromWatchlist(c *fiber.Ctx) error {
 		})
 	}
 
-	db, err := database.OpenDBConnection()
-
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(dtos.ErrorDTO{
-			Code:       fiber.StatusInternalServerError,
-			Message:    "Database connection error",
-			DevMessage: err.Error(),
-		})
-	}
-
 	user := c.UserContext().Value("user").(dtos.UserDTO)
 	dbSymbol := utils.GenerateDBStockSymbol(symbol.Symbol, symbol.Exchange)
 
-	db.RemoveSymbolFromWatchlist(user.ID.String(), idx, dbSymbol)
+	wc.Queries.RemoveSymbolFromWatchlist(user.ID.String(), idx, dbSymbol)
 
 	return c.Status(fiber.StatusOK).JSON(dtos.SuccessDTO{
 		Code:    fiber.StatusOK,

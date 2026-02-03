@@ -6,6 +6,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type MarketController struct{}
+
+func NewMarketController() *MarketController {
+	return &MarketController{}
+}
+
 // GetSymbols godoc
 // @Summary Get Market Symbols
 // @Description GetSymbols serves the list of market symbols from a static JSON file.
@@ -14,7 +20,7 @@ import (
 // @Success 200 {file} file "../data/stocks.json"
 // @Failure 500 {object} dtos.ErrorDTO
 // @Router /market/symbols [get]
-func GetSymbols(c *fiber.Ctx) error {
+func (mc *MarketController) GetSymbols(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).SendFile("data/stocks.json")
 }
 
@@ -32,7 +38,7 @@ func GetSymbols(c *fiber.Ctx) error {
 // @Failure 400 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
 // @Router /market/chart [get]
-func GetChartData(c *fiber.Ctx) error {
+func (mc *MarketController) GetChartData(c *fiber.Ctx) error {
 	exchange := c.Query("exchange")
 	symbol := c.Query("symbol")
 	chartRange := c.Query("range")
@@ -70,7 +76,7 @@ func GetChartData(c *fiber.Ctx) error {
 // @Failure 400 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
 // @Router /market/depth [get]
-func GetMarketDepth(c *fiber.Ctx) error {
+func (mc *MarketController) GetMarketDepth(c *fiber.Ctx) error {
 	exchange := c.Query("exchange")
 	symbol := c.Query("symbol")
 
@@ -111,7 +117,7 @@ func GetMarketDepth(c *fiber.Ctx) error {
 // @Failure 400 {object} dtos.ErrorDTO
 // @Failure 500 {object} dtos.ErrorDTO
 // @Router /market/symbols/status [post]
-func GetSymbolStatus(c *fiber.Ctx) error {
+func (mc *MarketController) GetSymbolStatus(c *fiber.Ctx) error {
 	symbols := dtos.SymbolListDTO{}
 	if err := c.BodyParser(&symbols); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
