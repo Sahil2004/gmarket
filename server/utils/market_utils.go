@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"math"
 	"math/rand"
 	"strconv"
@@ -11,7 +10,6 @@ import (
 	"sync"
 
 	"github.com/Sahil2004/gmarket/server/dtos"
-	"github.com/gofiber/fiber/v3/client"
 )
 
 var priceStore = struct {
@@ -142,25 +140,6 @@ func GetSymbolsStatus(symbols []dtos.SymbolDTO) (dtos.SymbolStatusDTO, error) {
 	return dtos.SymbolStatusDTO{
 		Symbols: statuses,
 	}, nil
-}
-
-func GetExchangeData(symbol string, chartRange string, interval string) (map[string]interface{}, error) {
-
-	url := "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol + "?range=" + chartRange + "&interval=" + interval
-
-	res, err := client.Get(url)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var result map[string]interface{}
-
-	if err := json.Unmarshal(res.Body(), &result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
 }
 
 func GenerateDBStockSymbol(symbol string, exchange string) string {
