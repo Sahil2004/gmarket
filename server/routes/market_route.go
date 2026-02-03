@@ -7,10 +7,11 @@ import (
 )
 
 func MarketRoute(a *fiber.App) {
+	marketController := controllers.NewMarketController()
 	marketRouter := a.Group("/market")
 
-	marketRouter.Get("/symbols", middlewares.AuthMiddleware, controllers.GetSymbols)
-	marketRouter.Post("/symbols/status", middlewares.AuthMiddleware, controllers.GetSymbolStatus)
-	marketRouter.Get("/chart", middlewares.AuthMiddleware, controllers.GetChartData)
-	marketRouter.Get("/depth", middlewares.AuthMiddleware, controllers.GetMarketDepth)
+	marketRouter.Get("/symbols", middlewares.AuthMiddleware, marketController.GetSymbols)
+	marketRouter.Post("/symbols/status", middlewares.AuthMiddleware, marketController.GetSymbolStatus)
+	marketRouter.Get("/chart", middlewares.AuthMiddleware, marketController.GetChartData)
+	marketRouter.Get("/depth", middlewares.AuthMiddleware, marketController.GetMarketDepth)
 }
