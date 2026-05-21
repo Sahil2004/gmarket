@@ -16,3 +16,20 @@ export interface IMarketDepth {
   symbol: string;
   ltp: number;
 }
+
+export interface ICandle {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+
+export type ChartRange = '1D' | '1W' | '1M' | '1Y';
+
+export interface ICandles {
+  symbol: string;
+  exchange: string;
+  range: ChartRange;
+  candles: ICandle[];
+}

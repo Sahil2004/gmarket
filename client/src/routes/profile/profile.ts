@@ -1,7 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { ChangePasswordDialog, ConfirmationDialog, InputImage } from '../../components';
-import { UserService } from '../../services/user.service';
+import { BankAccountDialog, ChangePasswordDialog, ConfirmationDialog, InputImage } from '../../components';
+import { PollingService, StocksService, TradingService, UserService } from '../../services';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import type { IUserData } from '../../types/user-data.types';
@@ -13,6 +13,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DESIGN_SYSTEM } from '../../config';
 import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { IBankAccount } from '../../types';
 
 @Component({
   selector: 'profile',
@@ -25,11 +27,15 @@ import { MatSelectModule } from '@angular/material/select';
     ReactiveFormsModule,
     InputImage,
     MatSelectModule,
+    MatIconModule,
   ],
 })
-export class Profile {
+export class Profile implements OnInit, OnDestroy {
   readonly router = inject(Router);
   readonly userService = inject(UserService);
+  private tradingService = inject(TradingService);
+  private pollingService = inject(PollingService);
+  private stocksService = inject(StocksService);
   readonly fb = inject(FormBuilder);
   readonly _snackBar = inject(MatSnackBar);
   readonly _dialog = inject(MatDialog);
@@ -58,6 +64,34 @@ export class Profile {
   }
 
   profilePhotoUri = signal<string | null>(this.user().profile_picture_url || null);
+  bankAccounts = signal<IBankAccount[]>([]);
+
+  ngOnInit(): void {
+    void this.loadBanks();
+  }
+
+  ngOnDestroy(): void {}
+
+  async loadBanks(): Promise<void> {
+    try {
+      const banks = await this.tradingService.getBankAccounts();
+      this.bankAccounts.set(banks);
+    } catch {
+      this.bankAccounts.set([]);
+    }
+  }
+
+  openCreateBankDialog(): void {
+    const ref = this._dialog.open(BankAccountDialog, { width: '400px' });
+    ref.afterClosed().subscribe((created) => {
+      if (created) void this.loadBanks();
+    });
+  }
+
+  async removeBank(bank: IBankAccount): Promise<void> {
+    await this.tradingService.removeBankAccount(bank.id);
+    await this.loadBanks();
+  }
 
   get nameInitials(): string {
     if (!this.user()) return '';
@@ -162,7 +196,10 @@ export class Profile {
 
   logoutHandler() {
     this.userService.logout().subscribe({
-      next: (res) => {
+      next: () => {
+        this.pollingService.stopAll();
+        this.stocksService.clearMarketPolling();
+        this.tradingService.stopPolling();
         this.router.navigate(['/login']);
       },
     });

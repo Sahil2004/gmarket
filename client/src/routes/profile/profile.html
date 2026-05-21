@@ -67,8 +67,28 @@
     </span>
   </mat-grid-tile>
   <mat-grid-tile rowspan="2">
-    <span class="w-full h-full flex flex-col gap-8">
-      <h1 class="text-3xl">Bank Accounts</h1>
+    <span class="w-full h-full flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-3xl">Bank Accounts</h1>
+        <button matButton="filled" (click)="openCreateBankDialog()">Create new</button>
+      </div>
+      @for (bank of bankAccounts(); track bank.id) {
+        <div class="flex justify-between items-center border border-gray-700/40 rounded p-2 text-sm">
+          <span>
+            <strong>{{ bank.bank_name }}</strong>
+            @if (bank.nickname) {
+              <span class="text-gray-500"> ({{ bank.nickname }})</span>
+            }
+            <br />
+            <span class="text-gray-500">{{ bank.account_number }} · {{ bank.ifsc }}</span>
+          </span>
+          <button matIconButton (click)="removeBank(bank)" aria-label="Remove bank">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      } @empty {
+        <p class="text-gray-500 text-sm">No bank accounts linked yet.</p>
+      }
     </span>
   </mat-grid-tile>
   <mat-grid-tile rowspan="2">

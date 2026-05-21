@@ -1,4 +1,15 @@
-import { Component, Input, signal, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -9,60 +20,92 @@ import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrollin
 @Component({
   selector: 'stocks-list',
   templateUrl: 'stocks-list.html',
+  styleUrl: 'stocks-list.css',
+  encapsulation: ViewEncapsulation.None,
   imports: [MatListModule, RouterLink, MatButtonModule, MatIconModule, ScrollingModule],
 })
-export class StocksList {
+export class StocksList implements OnChanges, AfterViewInit, OnDestroy {
+  private cdr = inject(ChangeDetectorRef);
   @Input({ required: true }) stocks: IWatchlistSymbol[] = [];
   @Input() displayActions: boolean = true;
-  @Input() buyHandler: (stock: string) => void = () => {};
-  @Input() sellHandler: (stock: string) => void = () => {};
+  @Input() buyHandler: (symbol: string, exchange: string) => void = () => {};
+  @Input() sellHandler: (symbol: string, exchange: string) => void = () => {};
   @Input() removeFromWatchlistHandler: (symbol: string, exchange: string) => void = () => {};
   @Input() getStockData: (symbols: IWatchlistSymbol[]) => Promise<IWatchlistSymbolInfo[]> = () => {
     return Promise.resolve([]);
   };
-  @Input() refreshAfterMs: number = 2 * 1000; // 2 seconds
+  @Input() refreshAfterMs: number = 2 * 1000;
 
-  @ViewChild(CdkVirtualScrollViewport)
-  viewport!: CdkVirtualScrollViewport;
+  @ViewChild(CdkVirtualScrollViewport) viewport!: CdkVirtualScrollViewport;
 
-  ITEM_SIZE = 48;
+  readonly ITEM_SIZE = 48;
 
-  stockDataMap = signal<Map<string, IWatchlistSymbolInfo>>(new Map());
+  stockDataMap = new Map<string, IWatchlistSymbolInfo>();
   intervalId: ReturnType<typeof setInterval> | null = null;
+  private resizeObserver: ResizeObserver | null = null;
 
-  trackBySymbol(index: number, stock: IWatchlistSymbol) {
-    return stock.symbol;
+  trackBySymbol(_index: number, stock: IWatchlistSymbol) {
+    return `${stock.exchange}:${stock.symbol}`;
   }
 
-  async updateStockData(visibleStocks: IWatchlistSymbol[]) {
-    const data = await this.getStockData(visibleStocks);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['stocks']) return;
 
-    this.stockDataMap.update((map) => {
-      const next = new Map(map);
-      for (const item of data) {
-        next.set(item.symbol, item);
-      }
-      return next;
+    this.stockDataMap = new Map();
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+    if (this.stocks.length > 0) {
+      void this.updateStockData(this.stocks);
+    }
+    queueMicrotask(() => this.recheckViewport());
+  }
+
+  ngAfterViewInit(): void {
+    const el = this.viewport?.elementRef.nativeElement;
+    if (el) {
+      this.resizeObserver = new ResizeObserver(() => this.recheckViewport());
+      this.resizeObserver.observe(el);
+    }
+    this.recheckViewport();
+    if (this.stocks.length > 0) {
+      this.onScroll();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.intervalId !== null) clearInterval(this.intervalId);
+    this.resizeObserver?.disconnect();
+  }
+
+  recheckViewport(): void {
+    requestAnimationFrame(() => {
+      this.viewport?.checkViewportSize();
     });
+  }
+
+  async updateStockData(symbols: IWatchlistSymbol[]) {
+    const data = await this.getStockData(symbols);
+    for (const item of data) {
+      this.stockDataMap.set(`${item.exchange}:${item.symbol}`, item);
+    }
+    this.cdr.detectChanges();
+    this.recheckViewport();
   }
 
   onScroll() {
     if (!this.viewport) return;
 
-    const scrollOffset = this.viewport.measureScrollOffset();
-    const viewportHeight = this.viewport.getViewportSize();
-
-    const startIndex = Math.floor(scrollOffset / this.ITEM_SIZE);
-    const endIndex = Math.min(
-      this.stocks.length,
-      Math.ceil((scrollOffset + viewportHeight) / this.ITEM_SIZE),
-    );
-    const visibleStocks = this.stocks.slice(startIndex, endIndex);
-    this.updateStockData(visibleStocks);
+    void this.updateStockData(this.stocks);
     if (this.intervalId !== null) clearInterval(this.intervalId);
-    this.intervalId = setInterval(async () => {
-      await this.updateStockData(visibleStocks);
+    this.intervalId = setInterval(() => {
+      void this.updateStockData(this.stocks);
     }, this.refreshAfterMs);
+  }
+
+  getStockInfo(stock: IWatchlistSymbol): IWatchlistSymbolInfo | undefined {
+    return this.stockDataMap.get(`${stock.exchange}:${stock.symbol}`);
   }
 
   activated(stock: string): boolean {

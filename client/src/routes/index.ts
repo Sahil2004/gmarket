@@ -4,3 +4,6 @@ export * from './dashboard/dashboard';
 export * from './profile/profile';
 export * from './watchlist/watchlist';
 export * from './stock-chart/stock-chart';
+export * from './portfolio/portfolio';
+export * from './orders/orders';
+export * from './funds/funds';

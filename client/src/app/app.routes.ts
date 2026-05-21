@@ -27,6 +27,18 @@ export const routes: Routes = [
         ],
       },
       {
+        path: 'portfolio',
+        loadComponent: () => import('../routes').then((m) => m.Portfolio),
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('../routes').then((m) => m.Orders),
+      },
+      {
+        path: 'funds',
+        loadComponent: () => import('../routes').then((m) => m.Funds),
+      },
+      {
         path: 'profile',
         loadComponent: () => import('../routes').then((m) => m.Profile),
         resolve: {

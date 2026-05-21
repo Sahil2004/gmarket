@@ -47,6 +47,8 @@ func main() {
 	routes.UserRoute(api, queries, imageService)
 	routes.MarketRoute(api)
 	routes.WatchlistRoute(api, queries)
+	routes.TradingRoute(api, queries)
+	routes.AlgoRoute(api, queries)
 
 	routes.NotFoundRoute(api)
 

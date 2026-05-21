@@ -98,3 +98,39 @@ func (mc *MarketController) GetSymbolStatus(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(statuses)
 }
+
+// GetCandles godoc
+// @Summary Get OHLC candle data
+// @Description GetCandles returns simulated OHLC candles for a symbol and time range.
+// @Tags market
+// @Produce json
+// @Param exchange query string true "Exchange (e.g., NSE)" default(NSE)
+// @Param symbol query string true "Stock Symbol (e.g., RELIANCE)" default(RELIANCE)
+// @Param range query string true "Time range (1D, 1W, 1M, 1Y)" default(1D)
+// @Success 200 {object} dtos.CandlesDTO
+// @Failure 400 {object} dtos.ErrorDTO
+// @Failure 500 {object} dtos.ErrorDTO
+// @Router /market/candles [get]
+func (mc *MarketController) GetCandles(c *fiber.Ctx) error {
+	exchange := c.Query("exchange")
+	symbol := c.Query("symbol")
+	rangeKey := c.Query("range", "1D")
+
+	if exchange == "" || symbol == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+			Code:    fiber.StatusBadRequest,
+			Message: "Missing required query parameters",
+		})
+	}
+
+	candles, err := utils.GetCandles(symbol, exchange, rangeKey)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(dtos.ErrorDTO{
+			Code:       fiber.StatusBadRequest,
+			Message:    "Failed to fetch candle data",
+			DevMessage: err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(candles)
+}

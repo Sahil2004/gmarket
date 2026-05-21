@@ -8,6 +8,8 @@ type Queries struct {
 	*queries.UserQueries
 	*queries.SessionQueries
 	*queries.WatchlistQueries
+	*queries.TradingQueries
+	*queries.AlgoQueries
 }
 
 func OpenDBConnection() (*Queries, error) {
@@ -21,5 +23,7 @@ func OpenDBConnection() (*Queries, error) {
 		UserQueries:      &queries.UserQueries{DB: db},
 		SessionQueries:   &queries.SessionQueries{DB: db},
 		WatchlistQueries: &queries.WatchlistQueries{DB: db},
+		TradingQueries:   &queries.TradingQueries{DB: db},
+		AlgoQueries:      &queries.AlgoQueries{DB: db},
 	}, nil
 }

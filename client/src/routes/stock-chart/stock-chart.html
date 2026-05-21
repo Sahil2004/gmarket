@@ -1,56 +1,143 @@
-<section class="p-4 space-y-4">
-  <!-- Header -->
-  <div class="flex items-center justify-between">
-    <span>
-      <h1 class="text-2xl font-semibold">{{ stockSymbol() }}</h1>
-      <p class="text-sm text-gray-500">Market Depth</p>
-    </span>
+<section class="flex flex-col h-[calc(90vh-2.5rem)] p-4 gap-3 overflow-hidden">
+  <div class="shrink-0 space-y-2">
+    <div class="flex items-center justify-between">
+      <span>
+        <h1 class="text-2xl font-semibold">{{ stockSymbol() }}</h1>
+        <p class="text-sm text-gray-500">Market Depth</p>
+      </span>
+      <span class="text-right">
+        <p class="text-sm text-gray-500">LTP</p>
+        <p class="text-2xl font-bold">{{ depthData().ltp }}</p>
+      </span>
+    </div>
 
-    <span class="text-right">
-      <p class="text-sm text-gray-500">LTP</p>
-      <p class="text-2xl font-bold">{{ depthData().ltp }}</p>
-    </span>
+    <div class="grid grid-cols-2 gap-1 text-xs font-medium text-gray-500 px-1">
+      <span class="text-emerald-600">Bids</span>
+      <span class="text-red-600 text-right">Asks</span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 max-h-[28vh] overflow-hidden">
+      <div class="rounded border border-emerald-900/30 bg-emerald-950/20 overflow-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr
+              class="text-[10px] uppercase tracking-wide text-emerald-700/80 border-b border-emerald-900/30"
+            >
+              <th class="py-1 pl-2 text-left font-medium">Qty</th>
+              <th class="py-1 text-center font-medium">Ord</th>
+              <th class="py-1 pr-2 text-right font-medium">Bid</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of depthData().bids; track $index) {
+              <tr class="relative text-emerald-400">
+                <td
+                  class="absolute inset-y-0 right-0 bg-emerald-500/15 pointer-events-none"
+                  [style.width.%]="qtyBarWidth(row.qty, maxBidQty())"
+                ></td>
+                <td class="relative py-0.5 pl-2 text-left tabular-nums">{{ row.qty }}</td>
+                <td class="relative py-0.5 text-center tabular-nums text-emerald-600/70">
+                  {{ row.orders }}
+                </td>
+                <td class="relative py-0.5 pr-2 text-right tabular-nums font-medium">
+                  {{ row.price }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rounded border border-red-900/30 bg-red-950/20 overflow-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr
+              class="text-[10px] uppercase tracking-wide text-red-700/80 border-b border-red-900/30"
+            >
+              <th class="py-1 pl-2 text-left font-medium">Ask</th>
+              <th class="py-1 text-center font-medium">Ord</th>
+              <th class="py-1 pr-2 text-right font-medium">Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of depthData().asks; track $index) {
+              <tr class="relative text-red-400">
+                <td
+                  class="absolute inset-y-0 left-0 bg-red-500/15 pointer-events-none"
+                  [style.width.%]="qtyBarWidth(row.qty, maxAskQty())"
+                ></td>
+                <td class="relative py-0.5 pl-2 text-left tabular-nums font-medium">
+                  {{ row.price }}
+                </td>
+                <td class="relative py-0.5 text-center tabular-nums text-red-600/70">
+                  {{ row.orders }}
+                </td>
+                <td class="relative py-0.5 pr-2 text-right tabular-nums">{{ row.qty }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex justify-center text-sm text-gray-600">
+      Spread:
+      <span class="ml-1 font-medium">
+        {{ ((depthData().asks[0]?.price ?? 0) - (depthData().bids[0]?.price ?? 0)).toFixed(2) }}
+      </span>
+    </div>
   </div>
 
-  <table mat-table [dataSource]="depthData().bids">
-    <ng-container matColumnDef="price">
-      <th mat-header-cell *matHeaderCellDef class="text-left">Bid Price</th>
-      <td mat-cell *matCellDef="let element" class="text-left">{{ element.price }}</td>
-    </ng-container>
-    <ng-container matColumnDef="orders">
-      <th mat-header-cell *matHeaderCellDef class="text-right">Orders</th>
-      <td mat-cell *matCellDef="let element" class="text-right">{{ element.orders }}</td>
-    </ng-container>
-    <ng-container matColumnDef="qty">
-      <th mat-header-cell *matHeaderCellDef class="text-right">Quantity</th>
-      <td mat-cell *matCellDef="let element" class="text-right">{{ element.qty }}</td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  </table>
-
-  <table mat-table [dataSource]="depthData().asks">
-    <ng-container matColumnDef="price">
-      <th mat-header-cell *matHeaderCellDef class="text-left">Ask Price</th>
-      <td mat-cell *matCellDef="let element" class="text-left">{{ element.price }}</td>
-    </ng-container>
-    <ng-container matColumnDef="orders">
-      <th mat-header-cell *matHeaderCellDef class="text-right">Orders</th>
-      <td mat-cell *matCellDef="let element" class="text-right">{{ element.orders }}</td>
-    </ng-container>
-    <ng-container matColumnDef="qty">
-      <th mat-header-cell *matHeaderCellDef class="text-right">Quantity</th>
-      <td mat-cell *matCellDef="let element" class="text-right">{{ element.qty }}</td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  </table>
-
-  <!-- Spread -->
-  <div class="flex justify-center text-sm text-gray-600">
-    Spread:
-    <span class="ml-1 font-medium">
-      {{ ((depthData().asks[0]?.price ?? 0) - (depthData().bids[0]?.price ?? 0)).toFixed(2) }}
-    </span>
+  <div class="flex-1 min-h-0 flex gap-3 border-t border-gray-700/60 pt-3 overflow-hidden">
+    <div class="flex-1 min-h-0 flex flex-col gap-2">
+      <div class="flex items-center justify-between shrink-0">
+        <p class="text-sm font-medium text-gray-400">Chart</p>
+        <div class="flex gap-1 items-center">
+          <span class="text-[10px] text-amber-500 mr-1">— MA fast</span>
+          <span class="text-[10px] text-blue-500 mr-2">— MA slow</span>
+          @for (range of ranges; track range) {
+            <button
+              type="button"
+              class="px-2.5 py-1 text-xs rounded border transition-colors"
+              [class.bg-gray-700]="selectedRange() === range"
+              [class.border-gray-500]="selectedRange() === range"
+              [class.text-white]="selectedRange() === range"
+              [class.border-gray-700]="selectedRange() !== range"
+              [class.text-gray-400]="selectedRange() !== range"
+              (click)="setRange(range)"
+            >
+              {{ range }}
+            </button>
+          }
+        </div>
+      </div>
+      <div class="relative flex-1 min-h-0 w-full rounded border border-gray-700/60 overflow-hidden">
+        @if (currentCandle(); as c) {
+          <div
+            class="absolute top-2 left-2 z-10 flex flex-wrap gap-x-3 gap-y-0.5 rounded bg-gray-900/85 px-2.5 py-1.5 text-xs tabular-nums backdrop-blur-sm border border-gray-700/60"
+          >
+            <span class="text-gray-400">O <span class="text-gray-200">{{ c.open }}</span></span>
+            <span class="text-emerald-400">H <span class="text-emerald-300">{{ c.high }}</span></span>
+            <span class="text-red-400">L <span class="text-red-300">{{ c.low }}</span></span>
+            <span
+              [class.text-emerald-400]="c.close >= c.open"
+              [class.text-red-400]="c.close < c.open"
+            >
+              C <span>{{ c.close }}</span>
+            </span>
+          </div>
+        }
+        <div #chartHost class="absolute inset-0"></div>
+      </div>
+    </div>
+    <div class="w-80 shrink-0 overflow-y-auto min-h-0">
+      <stock-algo-panel
+        [symbol]="stockSymbol()"
+        [exchange]="exchange()"
+        [range]="selectedRange()"
+        [indicators]="algoIndicators()"
+        (saved)="onAlgoSaved()"
+      />
+    </div>
   </div>
 </section>

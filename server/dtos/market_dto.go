@@ -27,3 +27,18 @@ type SymbolWithStatusDTO struct {
 type SymbolStatusDTO struct {
 	Symbols []SymbolWithStatusDTO `json:"symbols"`
 }
+
+type CandleDTO struct {
+	Time  int64   `json:"time"`
+	Open  float64 `json:"open"`
+	High  float64 `json:"high"`
+	Low   float64 `json:"low"`
+	Close float64 `json:"close"`
+}
+
+type CandlesDTO struct {
+	Symbol   string      `json:"symbol"`
+	Exchange string      `json:"exchange"`
+	Range    string      `json:"range"`
+	Candles  []CandleDTO `json:"candles"`
+}
