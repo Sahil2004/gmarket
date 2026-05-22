@@ -4,6 +4,7 @@ import {
   computed,
   effect,
   ElementRef,
+  HostListener,
   inject,
   OnDestroy,
   signal,
@@ -38,7 +39,9 @@ export class StockChart implements OnDestroy {
   private data = toSignal(this.route.data);
   private params = toSignal(this.route.paramMap);
 
+  pageRoot = viewChild.required<ElementRef<HTMLElement>>('pageRoot');
   chartHost = viewChild.required<ElementRef<HTMLDivElement>>('chartHost');
+  chartViewport = viewChild.required<ElementRef<HTMLDivElement>>('chartViewport');
 
   stockSymbol = computed(() => this.params()?.get('symbol') ?? '');
   exchange = computed(() => this.params()?.get('exchange') ?? '');
@@ -54,6 +57,8 @@ export class StockChart implements OnDestroy {
   selectedRange = signal<ChartRange>('1D');
   currentCandle = signal<ICandle | null>(null);
   algoIndicators = signal<IAlgoIndicators | null>(null);
+  compactLayout = signal(false);
+  fullscreenChart = signal(false);
 
   maxBidQty = computed(() => Math.max(...this.depthData().bids.map((b) => b.qty), 1));
   maxAskQty = computed(() => Math.max(...this.depthData().asks.map((a) => a.qty), 1));
@@ -65,6 +70,7 @@ export class StockChart implements OnDestroy {
   private lastCandleTime: UTCTimestamp | null = null;
   private uiIntervalId: ReturnType<typeof setInterval> | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private layoutObserver: ResizeObserver | null = null;
   private chartReady = signal(false);
 
   qtyBarWidth(qty: number, maxQty: number): number {
@@ -76,6 +82,7 @@ export class StockChart implements OnDestroy {
 
     afterNextRender(() => {
       this.initChart();
+      this.observeLayout();
       this.chartReady.set(true);
       this.activateMarketTargets();
       void this.loadCandles();
@@ -98,9 +105,16 @@ export class StockChart implements OnDestroy {
   ngOnDestroy(): void {
     if (this.uiIntervalId) clearInterval(this.uiIntervalId);
     this.resizeObserver?.disconnect();
+    this.layoutObserver?.disconnect();
     this.chart?.remove();
     this.stockService.setDepthActive(null, null);
     this.stockService.setChartActive(null, null, null);
+  }
+
+  @HostListener('document:fullscreenchange')
+  onFullscreenChange(): void {
+    const viewport = this.chartViewport()?.nativeElement;
+    this.fullscreenChart.set(Boolean(viewport && document.fullscreenElement === viewport));
   }
 
   setRange(range: ChartRange): void {
@@ -113,6 +127,18 @@ export class StockChart implements OnDestroy {
 
   onAlgoSaved(): void {
     void this.loadAlgoIndicators();
+  }
+
+  toggleFullscreen(): void {
+    const viewport = this.chartViewport()?.nativeElement;
+    if (!viewport) return;
+
+    if (document.fullscreenElement === viewport) {
+      void document.exitFullscreen();
+      return;
+    }
+
+    void viewport.requestFullscreen();
   }
 
   private activateMarketTargets(): void {
@@ -188,6 +214,17 @@ export class StockChart implements OnDestroy {
     });
     this.resizeObserver.observe(host);
     this.chart.applyOptions({ width: host.clientWidth, height: host.clientHeight });
+  }
+
+  private observeLayout(): void {
+    const root = this.pageRoot().nativeElement;
+    const updateLayout = (width: number) => {
+      this.compactLayout.set(width < 1200);
+    };
+
+    updateLayout(root.clientWidth);
+    this.layoutObserver = new ResizeObserver(() => updateLayout(root.clientWidth));
+    this.layoutObserver.observe(root);
   }
 
   private updateMaLines(ind: IAlgoIndicators): void {
