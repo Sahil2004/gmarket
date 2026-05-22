@@ -34,6 +34,9 @@ export class Dashboard {
   opened = true;
   navItems = [
     { label: 'watchlist', icon: 'bookmark' },
+    { label: 'portfolio', icon: 'account_balance_wallet' },
+    { label: 'orders', icon: 'receipt_long' },
+    { label: 'funds', icon: 'payments' },
     { label: 'profile', icon: 'person' },
   ];
   activeLink = this.router.url.split('/').pop();

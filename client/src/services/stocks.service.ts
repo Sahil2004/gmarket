@@ -1,47 +1,103 @@
 import { inject, Injectable } from '@angular/core';
-import { IMarketDepth, IStock } from '../types/stocks.types';
+import { ChartRange, ICandles, IMarketDepth, IStock } from '../types/stocks.types';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, map, shareReplay, type Observable } from 'rxjs';
 import { IWatchlistSymbol, IWatchlistSymbolInfo } from '../types';
-import e from 'express';
-import { DESIGN_SYSTEM } from '../config';
+import { PollingService } from './polling.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StocksService {
   private http = inject(HttpClient);
+  private polling = inject(PollingService);
   private stocks$: Observable<IStock[]> = this.http
     .get<IStock[]>('/market/symbols')
     .pipe(shareReplay(1));
-  private stocksListWithData: IWatchlistSymbolInfo[] = [];
+  private stockDataCache = new Map<string, IWatchlistSymbolInfo>();
   private fetchedData: { symbols: IWatchlistSymbolInfo[] } = { symbols: [] };
   private symbolsToFetchSet: IWatchlistSymbol[] = [];
   private depthStock: IWatchlistSymbol | null = null;
   private fetchedDepthData: IMarketDepth | null = null;
-  private ds = inject(DESIGN_SYSTEM);
+  private chartStock: { symbol: string; exchange: string; range: ChartRange } | null = null;
+  private fetchedCandles: ICandles | null = null;
 
   constructor() {
-    // Polling
-    setInterval(async () => {
-      if (this.stocksListWithData.length > 0) {
-        this.fetchedData = await firstValueFrom(
-          this.http.post<{ symbols: IWatchlistSymbolInfo[] }>('/market/symbols/status', {
-            symbols: this.symbolsToFetchSet,
-          }),
-        );
+    this.polling.register('market', () => this.pollMarket());
+  }
+
+  setWatchlistPolling(active: boolean): void {
+    if (active) {
+      this.polling.start('market');
+    } else if (!this.depthStock && !this.chartStock) {
+      this.polling.stop('market');
+    }
+  }
+
+  setDepthActive(symbol: string | null, exchange: string | null): void {
+    if (symbol && exchange) {
+      this.depthStock = { symbol, exchange };
+      this.polling.start('market');
+    } else {
+      this.depthStock = null;
+      this.fetchedDepthData = null;
+      if (!this.chartStock && this.symbolsToFetchSet.length === 0) {
+        this.polling.stop('market');
       }
-      if (this.depthStock !== null) {
-        this.fetchedDepthData = await firstValueFrom(
-          this.http.get<IMarketDepth>('/market/depth', {
-            params: {
-              symbol: this.depthStock.symbol,
-              exchange: this.depthStock.exchange,
-            },
-          }),
-        );
+    }
+  }
+
+  setChartActive(symbol: string | null, exchange: string | null, range: ChartRange | null): void {
+    if (symbol && exchange && range) {
+      this.chartStock = { symbol, exchange, range };
+      this.polling.start('market');
+    } else {
+      this.chartStock = null;
+      this.fetchedCandles = null;
+      if (!this.depthStock && this.symbolsToFetchSet.length === 0) {
+        this.polling.stop('market');
       }
-    }, this.ds.devConfig.pollingTimeMs);
+    }
+  }
+
+  clearMarketPolling(): void {
+    this.symbolsToFetchSet = [];
+    this.depthStock = null;
+    this.chartStock = null;
+    this.fetchedDepthData = null;
+    this.fetchedCandles = null;
+    this.polling.stop('market');
+  }
+
+  private async pollMarket(): Promise<void> {
+    if (this.symbolsToFetchSet.length > 0) {
+      this.fetchedData = await firstValueFrom(
+        this.http.post<{ symbols: IWatchlistSymbolInfo[] }>('/market/symbols/status', {
+          symbols: this.symbolsToFetchSet,
+        }),
+      );
+    }
+    if (this.depthStock) {
+      this.fetchedDepthData = await firstValueFrom(
+        this.http.get<IMarketDepth>('/market/depth', {
+          params: {
+            symbol: this.depthStock.symbol,
+            exchange: this.depthStock.exchange,
+          },
+        }),
+      );
+    }
+    if (this.chartStock) {
+      this.fetchedCandles = await firstValueFrom(
+        this.http.get<ICandles>('/market/candles', {
+          params: {
+            symbol: this.chartStock.symbol,
+            exchange: this.chartStock.exchange,
+            range: this.chartStock.range,
+          },
+        }),
+      );
+    }
   }
 
   getAllStocks(): Observable<IStock[]> {
@@ -55,55 +111,60 @@ export class StocksService {
     );
   }
 
-  async getStocksData(symbols: IWatchlistSymbol[]): Promise<IWatchlistSymbolInfo[]> {
-    // process the fetched data
-    const fetchedDataMap = new Map<string, IWatchlistSymbolInfo>();
-    for (const item of this.fetchedData.symbols) {
-      fetchedDataMap.set(item.symbol, item);
-    }
-    this.stocksListWithData = this.stocksListWithData.map((stock) => {
-      const updatedData = fetchedDataMap.get(stock.symbol);
-      return updatedData ? updatedData : stock;
-    });
-    // Update the stocks list to match the requested symbols
-    const incomingSymbolSet = new Set(symbols.map((s) => s.symbol));
-    this.stocksListWithData = this.stocksListWithData.filter((stock) =>
-      incomingSymbolSet.has(stock.symbol),
-    );
-    const existingSymbolSet = new Set(this.stocksListWithData.map((stock) => stock.symbol));
-    const newSymbols = symbols.filter((s) => !existingSymbolSet.has(s.symbol));
+  private cacheKey(symbol: IWatchlistSymbol): string {
+    return `${symbol.exchange}:${symbol.symbol}`;
+  }
 
-    // Fetch data for new symbols and add them
-    if (newSymbols.length > 0) {
+  async getStocksData(symbols: IWatchlistSymbol[]): Promise<IWatchlistSymbolInfo[]> {
+    for (const item of this.fetchedData.symbols) {
+      this.stockDataCache.set(this.cacheKey(item), item);
+    }
+
+    const missing = symbols.filter((s) => !this.stockDataCache.has(this.cacheKey(s)));
+    if (missing.length > 0) {
       const fetchedData = await firstValueFrom(
         this.http.post<{ symbols: IWatchlistSymbolInfo[] }>('/market/symbols/status', {
-          symbols: newSymbols,
+          symbols: missing,
         }),
       );
-
-      this.stocksListWithData.push(...fetchedData.symbols);
+      for (const item of fetchedData.symbols) {
+        this.stockDataCache.set(this.cacheKey(item), item);
+      }
     }
     this.symbolsToFetchSet = symbols;
 
-    return this.stocksListWithData;
+    return symbols
+      .map((s) => this.stockDataCache.get(this.cacheKey(s)))
+      .filter((item): item is IWatchlistSymbolInfo => item !== undefined);
   }
 
   async getDepthData(symbol: string, exchange: string): Promise<IMarketDepth> {
-    if (
-      this.depthStock === null ||
-      this.depthStock.symbol !== symbol ||
-      this.depthStock.exchange !== exchange
-    ) {
-      this.depthStock = { symbol, exchange };
-      this.fetchedDepthData = await firstValueFrom(
-        this.http.get<IMarketDepth>('/market/depth', {
-          params: {
-            exchange,
-            symbol,
-          },
-        }),
-      );
+    this.setDepthActive(symbol, exchange);
+    if (!this.fetchedDepthData) {
+      await this.pollMarket();
     }
     return this.fetchedDepthData as IMarketDepth;
+  }
+
+  peekDepthData(): IMarketDepth | null {
+    return this.fetchedDepthData;
+  }
+
+  async getCandles(symbol: string, exchange: string, range: ChartRange): Promise<ICandles> {
+    const changed =
+      !this.chartStock ||
+      this.chartStock.symbol !== symbol ||
+      this.chartStock.exchange !== exchange ||
+      this.chartStock.range !== range;
+
+    this.setChartActive(symbol, exchange, range);
+    if (changed || !this.fetchedCandles) {
+      await this.pollMarket();
+    }
+    return this.fetchedCandles as ICandles;
+  }
+
+  peekCandles(): ICandles | null {
+    return this.fetchedCandles;
   }
 }

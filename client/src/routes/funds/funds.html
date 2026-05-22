@@ -1,0 +1,39 @@
+<section class="p-4 space-y-4 max-w-lg">
+  <h1 class="text-2xl font-semibold">Funds</h1>
+  @if (snapshot(); as s) {
+    <div class="text-sm tabular-nums space-y-1 mb-4">
+      <p>Cash balance: <strong>{{ s.account.cash_balance | currency:'INR' }}</strong></p>
+      <p>Available: <strong>{{ s.account.available | currency:'INR' }}</strong></p>
+    </div>
+    <p class="text-sm text-gray-500">Add or withdraw using a bank account from your profile.</p>
+    <form [formGroup]="fundForm" (ngSubmit)="transferFunds()" class="flex flex-col gap-3 mt-4">
+      <mat-form-field>
+        <mat-label>Bank account</mat-label>
+        <mat-select formControlName="bank_account_id">
+          @for (bank of s.bank_accounts; track bank.id) {
+            <mat-option [value]="bank.id">{{ bank.bank_name }} ({{ bank.account_number }})</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      @if (s.bank_accounts.length === 0) {
+        <p class="text-amber-600 text-sm">No bank accounts linked. Add one from Profile.</p>
+      }
+      <mat-form-field>
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option value="deposit">Deposit</mat-option>
+          <mat-option value="withdraw">Withdraw</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Amount</mat-label>
+        <input matInput type="number" formControlName="amount" />
+      </mat-form-field>
+      <button matButton="filled" type="submit" [disabled]="fundForm.invalid || s.bank_accounts.length === 0">
+        Submit
+      </button>
+    </form>
+  } @else {
+    <p class="text-gray-500">Loading…</p>
+  }
+</section>

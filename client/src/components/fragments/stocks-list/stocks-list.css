@@ -1,0 +1,8 @@
+.watchlist-viewport {
+  height: 70vh;
+  display: block;
+}
+
+.watchlist-viewport .cdk-virtual-scroll-content-wrapper {
+  width: 100%;
+}

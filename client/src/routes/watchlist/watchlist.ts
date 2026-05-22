@@ -1,12 +1,14 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { Search, WatchlistTabs } from '../../components';
+import { MatDialog } from '@angular/material/dialog';
+import { Search, WatchlistTabs, OrderDialog } from '../../components';
 import { StocksService, WatchlistService } from '../../services';
 import { IStock } from '../../types/stocks.types';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IWatchlist, IWatchlistSymbol } from '../../types';
+import { IOrderDialogData, IWatchlist, IWatchlistSymbol } from '../../types';
 import { DESIGN_SYSTEM } from '../../config';
 
 @Component({
@@ -14,19 +16,19 @@ import { DESIGN_SYSTEM } from '../../config';
   templateUrl: 'watchlist.html',
   imports: [RouterOutlet, MatSidenavModule, Search, WatchlistTabs],
 })
-export class Watchlist {
+export class Watchlist implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private routerSub?: Subscription;
   private data = toSignal(this.route.data);
   stockList = computed(() => this.data()?.['stockData'] as IStock[]);
   private stockService = inject(StocksService);
   private watchlistService = inject(WatchlistService);
   private _snackBar = inject(MatSnackBar);
+  private _dialog = inject(MatDialog);
   private ds = inject(DESIGN_SYSTEM);
 
-  throttlingTimeMs = computed(() => {
-    console.log(this.ds.devConfig.throttlingTimeMs);
-    return this.ds.devConfig.throttlingTimeMs;
-  });
+  throttlingTimeMs = computed(() => this.ds.devConfig.throttlingTimeMs);
 
   currentWatchlistIdx = signal<number>(0);
   watchlistUpdatedAt = signal<Date | null>(null);
@@ -42,14 +44,6 @@ export class Watchlist {
     }
   });
 
-  getStockSymbols(stocks: IStock[]): string[] {
-    return stocks.map((stock) => stock.symbol);
-  }
-
-  updateWatchlists() {
-    this.watchlistUpdatedAt.set(new Date());
-  }
-
   addStockToWatchlist() {
     return (symbol: string, exchange: string) => {
       return this.stockService.isAStockSymbol(symbol).subscribe(async (decision) => {
@@ -62,34 +56,29 @@ export class Watchlist {
             );
             this.updateWatchlists();
           } catch (err) {
-            let snackBarRef = this._snackBar.open('Invalid stock symbol', 'Close', {
-              duration: 3000,
-            });
-            snackBarRef.onAction().subscribe(() => {
-              snackBarRef.dismiss();
-            });
+            this._snackBar.open('Invalid stock symbol', 'Close', { duration: 3000 });
           }
         } else {
-          let snackBarRef = this._snackBar.open('Invalid stock symbol', 'Close', {
-            duration: 3000,
-          });
-          snackBarRef.onAction().subscribe(() => {
-            snackBarRef.dismiss();
-          });
+          this._snackBar.open('Invalid stock symbol', 'Close', { duration: 3000 });
         }
       });
     };
   }
 
+  private openOrderDialog(symbol: string, exchange: string, side: 'buy' | 'sell') {
+    const data: IOrderDialogData = { symbol, exchange, side };
+    this._dialog.open(OrderDialog, { data, width: '400px' });
+  }
+
   buyHandler() {
-    return (stock: string) => {
-      alert(`Buying stock: ${stock}`);
+    return (symbol: string, exchange: string) => {
+      this.openOrderDialog(symbol, exchange, 'buy');
     };
   }
 
   sellHandler() {
-    return (stock: string) => {
-      alert(`Selling stock: ${stock}`);
+    return (symbol: string, exchange: string) => {
+      this.openOrderDialog(symbol, exchange, 'sell');
     };
   }
 
@@ -107,12 +96,37 @@ export class Watchlist {
   }
 
   watchlistChangeHandler() {
-    return (event: { index: number }) => this.currentWatchlistIdx.set(event.index);
+    return (event: { index: number }) => {
+      this.currentWatchlistIdx.set(event.index);
+      this.updateWatchlists();
+    };
   }
 
   getStockDataHandler() {
     return (symbols: IWatchlistSymbol[]) => {
       return this.stockService.getStocksData(symbols);
     };
+  }
+
+  updateWatchlists() {
+    this.watchlistUpdatedAt.set(new Date());
+  }
+
+  ngOnInit(): void {
+    this.syncWatchlistPolling();
+    this.routerSub = this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe(() => this.syncWatchlistPolling());
+  }
+
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+    this.stockService.setWatchlistPolling(false);
+    this.stockService.clearMarketPolling();
+  }
+
+  private syncWatchlistPolling(): void {
+    const onChart = /\/watchlist\/[^/]+\/[^/]+/.test(this.router.url);
+    this.stockService.setWatchlistPolling(!onChart);
   }
 }

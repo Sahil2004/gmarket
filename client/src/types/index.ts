@@ -3,3 +3,5 @@ export * from './user-data.types';
 export * from './error.types';
 export * from './design-system.types';
 export * from './watchlist.types';
+export * from './trading.types';
+export * from './algo.types';

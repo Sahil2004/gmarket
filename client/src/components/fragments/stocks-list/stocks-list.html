@@ -1,7 +1,7 @@
 <cdk-virtual-scroll-viewport
   [itemSize]="ITEM_SIZE"
   (scrolledIndexChange)="onScroll()"
-  class="h-[70vh] w-full"
+  class="watchlist-viewport w-full"
 >
   <mat-nav-list>
     <mat-list-item
@@ -12,7 +12,7 @@
         <a [routerLink]="['/watchlist/' + stock.exchange + '/' + stock.symbol]">{{
           stock.symbol
         }}</a>
-        @if (stockDataMap().get(stock.symbol); as data) {
+        @if (getStockInfo(stock); as data) {
           <span class="flex justify-between items-center gap-2 group-hover:hidden">
             <p class="text-gray-500">
               {{ (data.ltp - data.last_close_price).toFixed(2) }}
@@ -31,8 +31,8 @@
         }
         <span class="hidden justify-between items-center gap-2 group-hover:flex">
           @if (displayActions) {
-            <button matButton="filled" (click)="buyHandler(stock.symbol)">B</button>
-            <button matButton="outlined" (click)="sellHandler(stock.symbol)">S</button>
+            <button matButton="filled" (click)="buyHandler(stock.symbol, stock.exchange)">B</button>
+            <button matButton="outlined" (click)="sellHandler(stock.symbol, stock.exchange)">S</button>
             <button
               matIconButton
               aria-label="Remove from watchlist"

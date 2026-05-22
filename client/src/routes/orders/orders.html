@@ -1,0 +1,79 @@
+<section class="p-4 space-y-4 max-w-5xl">
+  <h1 class="text-2xl font-semibold">Orders</h1>
+  @if (snapshot(); as s) {
+    <h2 class="text-sm font-medium text-gray-500">Open</h2>
+    <table mat-table [dataSource]="s.open_orders" class="w-full">
+      <ng-container matColumnDef="symbol">
+        <th mat-header-cell *matHeaderCellDef>Symbol</th>
+        <td mat-cell *matCellDef="let o">{{ o.symbol }}</td>
+      </ng-container>
+      <ng-container matColumnDef="side">
+        <th mat-header-cell *matHeaderCellDef>Side</th>
+        <td mat-cell *matCellDef="let o">{{ o.side }}</td>
+      </ng-container>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let o">{{ o.product_type }} / {{ o.order_type }}</td>
+      </ng-container>
+      <ng-container matColumnDef="qty">
+        <th mat-header-cell *matHeaderCellDef>Qty</th>
+        <td mat-cell *matCellDef="let o">{{ o.quantity }}</td>
+      </ng-container>
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Price</th>
+        <td mat-cell *matCellDef="let o">{{ o.price }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let o">{{ o.status }}</td>
+      </ng-container>
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let o">
+          <button matIconButton (click)="cancelOrder(o)" aria-label="Cancel"><mat-icon>close</mat-icon></button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="orderCols"></tr>
+      <tr mat-row *matRowDef="let row; columns: orderCols"></tr>
+    </table>
+    @if (s.open_orders.length === 0) {
+      <p class="text-gray-500 text-sm py-4 text-center">No open orders</p>
+    }
+
+    <h2 class="text-sm font-medium text-gray-500 mt-6">Executed</h2>
+    <table mat-table [dataSource]="s.executed_orders" class="w-full">
+      <ng-container matColumnDef="symbol">
+        <th mat-header-cell *matHeaderCellDef>Symbol</th>
+        <td mat-cell *matCellDef="let o">{{ o.symbol }}</td>
+      </ng-container>
+      <ng-container matColumnDef="side">
+        <th mat-header-cell *matHeaderCellDef>Side</th>
+        <td mat-cell *matCellDef="let o">{{ o.side }}</td>
+      </ng-container>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let o">{{ o.product_type }} / {{ o.order_type }}</td>
+      </ng-container>
+      <ng-container matColumnDef="qty">
+        <th mat-header-cell *matHeaderCellDef>Qty</th>
+        <td mat-cell *matCellDef="let o">{{ o.filled_quantity }}</td>
+      </ng-container>
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Price</th>
+        <td mat-cell *matCellDef="let o">{{ o.price }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let o">{{ o.status }}</td>
+      </ng-container>
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Time</th>
+        <td mat-cell *matCellDef="let o">{{ o.executed_at | date:'short' }}</td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="orderCols"></tr>
+      <tr mat-row *matRowDef="let row; columns: orderCols"></tr>
+    </table>
+  } @else {
+    <p class="text-gray-500">Loading orders…</p>
+  }
+</section>

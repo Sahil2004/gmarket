@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"math"
 	"math/rand"
 	"strconv"
@@ -11,6 +12,31 @@ import (
 
 	"github.com/Sahil2004/gmarket/server/dtos"
 )
+
+type rangeConfig struct {
+	barCount int
+	interval time.Duration
+}
+
+var candleRangeConfigs = map[string]rangeConfig{
+	"1D": {barCount: 78, interval: 5 * time.Minute},
+	"1W": {barCount: 65, interval: 30 * time.Minute},
+	"1M": {barCount: 22, interval: 24 * time.Hour},
+	"1Y": {barCount: 252, interval: 24 * time.Hour},
+}
+
+type candleSeriesState struct {
+	candles  []dtos.CandleDTO
+	interval time.Duration
+	barCount int
+}
+
+var candleStore = struct {
+	sync.Mutex
+	m map[string]*candleSeriesState
+}{
+	m: make(map[string]*candleSeriesState),
+}
 
 var priceStore = struct {
 	sync.Mutex
@@ -149,4 +175,118 @@ func GenerateDBStockSymbol(symbol string, exchange string) string {
 func ParseDBStockSymbol(dbSymbol string) (string, string) {
 	parts := strings.SplitN(dbSymbol, ".", 2)
 	return parts[0], parts[1]
+}
+
+func roundPrice(value float64) float64 {
+	return math.Round(value*100) / 100
+}
+
+func alignCandleTime(t time.Time, interval time.Duration) time.Time {
+	if interval >= 24*time.Hour {
+		return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+	}
+	intervalSec := int64(interval.Seconds())
+	unix := t.Unix()
+	return time.Unix((unix/intervalSec)*intervalSec, 0)
+}
+
+func generateCandleHistory(endPrice float64, count int, interval time.Duration, end time.Time) []dtos.CandleDTO {
+	candles := make([]dtos.CandleDTO, count)
+	endAligned := alignCandleTime(end, interval)
+	price := endPrice
+	r := rand.New(rand.NewSource(end.UnixNano()))
+
+	for i := count - 1; i >= 0; i-- {
+		barTime := endAligned.Add(-time.Duration(count-1-i) * interval)
+		open := price
+		change := (r.Float64() - 0.5) * open * 0.012
+		close := open + change
+		wick := open * 0.006 * r.Float64()
+		high := math.Max(open, close) + wick
+		low := math.Min(open, close) - wick*0.8
+
+		candles[i] = dtos.CandleDTO{
+			Time:  barTime.Unix(),
+			Open:  roundPrice(open),
+			High:  roundPrice(high),
+			Low:   roundPrice(low),
+			Close: roundPrice(close),
+		}
+		price = close
+	}
+
+	last := &candles[count-1]
+	last.Close = roundPrice(endPrice)
+	if endPrice > last.High {
+		last.High = roundPrice(endPrice)
+	}
+	if endPrice < last.Low {
+		last.Low = roundPrice(endPrice)
+	}
+
+	return candles
+}
+
+func GetCandles(symbol string, exchange string, rangeKey string) (dtos.CandlesDTO, error) {
+	cfg, ok := candleRangeConfigs[rangeKey]
+	if !ok {
+		return dtos.CandlesDTO{}, errors.New("invalid range")
+	}
+
+	ltp, _, _, _, err := GetMarketData(symbol, exchange)
+	if err != nil {
+		return dtos.CandlesDTO{}, err
+	}
+
+	key := GenerateDBStockSymbol(symbol, exchange) + ":" + rangeKey
+	now := time.Now()
+	currentBarTime := alignCandleTime(now, cfg.interval).Unix()
+
+	candleStore.Lock()
+	defer candleStore.Unlock()
+
+	series, exists := candleStore.m[key]
+	if !exists {
+		candles := generateCandleHistory(ltp, cfg.barCount, cfg.interval, now)
+		candleStore.m[key] = &candleSeriesState{
+			candles:  candles,
+			interval: cfg.interval,
+			barCount: cfg.barCount,
+		}
+		return dtos.CandlesDTO{
+			Symbol:   symbol,
+			Exchange: exchange,
+			Range:    rangeKey,
+			Candles:  candles,
+		}, nil
+	}
+
+	lastBar := &series.candles[len(series.candles)-1]
+	if currentBarTime > lastBar.Time {
+		series.candles = append(series.candles, dtos.CandleDTO{
+			Time:  currentBarTime,
+			Open:  roundPrice(ltp),
+			High:  roundPrice(ltp),
+			Low:   roundPrice(ltp),
+			Close: roundPrice(ltp),
+		})
+		if len(series.candles) > series.barCount {
+			series.candles = series.candles[len(series.candles)-series.barCount:]
+		}
+	} else {
+		lastBar.Close = roundPrice(ltp)
+		if ltp > lastBar.High {
+			lastBar.High = roundPrice(ltp)
+		}
+		if ltp < lastBar.Low {
+			lastBar.Low = roundPrice(ltp)
+		}
+	}
+
+	return dtos.CandlesDTO{
+		Symbol:   symbol,
+		Exchange: exchange,
+		Range:    rangeKey,
+		Candles:  series.candles,
+	}, nil
 }
